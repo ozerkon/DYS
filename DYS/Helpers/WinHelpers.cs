@@ -5,14 +5,8 @@ using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
 using WebDriverManager;
 using WebDriverManager.DriverConfigs.Impl;
 
@@ -180,14 +174,14 @@ namespace DYS.Helpers
         public static List<IWebElement> GetElementsBy(string t, string tv, out string msg)
         {
             msg = "";
-            List<IWebElement> element = new List<IWebElement>();
+            List<IWebElement> elements = new List<IWebElement>();
             try
             {
                 WebDriverWait wait = GetWait();
                 if (!ExecuteScript(t, tv)) { wait.Until(e => ((IJavaScriptExecutor)driver).ExecuteScript("return document.readyState").Equals("complete")); }
 
 
-                element = wait.Until(e => e.FindElements(By.ClassName(tv))).ToList();
+                elements = wait.Until(e => e.FindElements(By.ClassName(tv))).ToList();
 
             }
             catch (Exception ex)
@@ -195,7 +189,7 @@ namespace DYS.Helpers
                 msg = ex.Message.ToString();
                 return null;
             }
-            return element;
+            return elements;
         }
         public static IWebElement GetButtonElementBy(string t, string tv, out string msg)
         {
