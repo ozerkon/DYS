@@ -42,6 +42,7 @@
             this.lblTckn = new System.Windows.Forms.Label();
             this.lblMessage = new System.Windows.Forms.Label();
             this.btnOnay = new System.Windows.Forms.Button();
+            this.cbRemember = new System.Windows.Forms.CheckBox();
             this.gbBrowser.SuspendLayout();
             this.gbLogin.SuspendLayout();
             this.gbLoginInfo.SuspendLayout();
@@ -86,7 +87,7 @@
             // 
             this.gbLogin.Controls.Add(this.rbMebbis);
             this.gbLogin.Controls.Add(this.rbEdevlet);
-            this.gbLogin.Location = new System.Drawing.Point(18, 97);
+            this.gbLogin.Location = new System.Drawing.Point(18, 87);
             this.gbLogin.Name = "gbLogin";
             this.gbLogin.Size = new System.Drawing.Size(291, 65);
             this.gbLogin.TabIndex = 0;
@@ -123,7 +124,7 @@
             this.gbLoginInfo.Controls.Add(this.textAddTcno);
             this.gbLoginInfo.Controls.Add(this.lblPass);
             this.gbLoginInfo.Controls.Add(this.lblTckn);
-            this.gbLoginInfo.Location = new System.Drawing.Point(18, 180);
+            this.gbLoginInfo.Location = new System.Drawing.Point(18, 161);
             this.gbLoginInfo.Name = "gbLoginInfo";
             this.gbLoginInfo.Size = new System.Drawing.Size(291, 98);
             this.gbLoginInfo.TabIndex = 0;
@@ -169,7 +170,7 @@
             // lblMessage
             // 
             this.lblMessage.ForeColor = System.Drawing.Color.Red;
-            this.lblMessage.Location = new System.Drawing.Point(20, 283);
+            this.lblMessage.Location = new System.Drawing.Point(20, 294);
             this.lblMessage.Name = "lblMessage";
             this.lblMessage.Size = new System.Drawing.Size(289, 47);
             this.lblMessage.TabIndex = 4;
@@ -177,7 +178,7 @@
             // 
             // btnOnay
             // 
-            this.btnOnay.Location = new System.Drawing.Point(18, 336);
+            this.btnOnay.Location = new System.Drawing.Point(18, 349);
             this.btnOnay.Name = "btnOnay";
             this.btnOnay.Size = new System.Drawing.Size(291, 49);
             this.btnOnay.TabIndex = 5;
@@ -185,17 +186,32 @@
             this.btnOnay.UseVisualStyleBackColor = true;
             this.btnOnay.Click += new System.EventHandler(this.btnOnay_Click);
             // 
+            // cbRemember
+            // 
+            this.cbRemember.AutoSize = true;
+            this.cbRemember.Location = new System.Drawing.Point(18, 268);
+            this.cbRemember.Name = "cbRemember";
+            this.cbRemember.Size = new System.Drawing.Size(85, 19);
+            this.cbRemember.TabIndex = 6;
+            this.cbRemember.Text = "Beni hatırla";
+            this.cbRemember.UseVisualStyleBackColor = true;
+            // 
             // fMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(329, 399);
+            this.ClientSize = new System.Drawing.Size(329, 407);
+            this.Controls.Add(this.cbRemember);
             this.Controls.Add(this.btnOnay);
             this.Controls.Add(this.lblMessage);
             this.Controls.Add(this.gbLoginInfo);
             this.Controls.Add(this.gbLogin);
             this.Controls.Add(this.gbBrowser);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(345, 446);
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(345, 446);
             this.Name = "fMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "DYS OTOMATİK ONAYLAMA";
@@ -207,6 +223,7 @@
             this.gbLoginInfo.ResumeLayout(false);
             this.gbLoginInfo.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -225,5 +242,6 @@
         private Label lblTckn;
         private Label lblMessage;
         private Button btnOnay;
+        private CheckBox cbRemember;
     }
 }

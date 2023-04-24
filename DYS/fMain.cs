@@ -223,8 +223,8 @@ namespace DYS
                 else { error = false; logged = false; Common.driver.Dispose(); lblMessage.Text = "Ýþlem iptal edildi"; return false; }
             }
             logged = true;
-            Settings.Default.passED = Common.pass;
-            Settings.Default.tckn = Common.tckn;
+            Settings.Default.passED = cbRemember.Checked? Common.pass: string.Empty;
+            Settings.Default.tckn = cbRemember.Checked? Common.tckn: string.Empty;
             Settings.Default.Save();
             return true;
         }
@@ -278,8 +278,8 @@ namespace DYS
                 lblMessage.Text = "Kullanýcý adý veya þifre yanlýþ"; error = true; logged = false; MebbisGiris();
             }
             logged= true;
-            Settings.Default.passMEB = Common.pass;
-            Settings.Default.tckn = Common.tckn;
+            Settings.Default.passMEB = cbRemember.Checked ? Common.pass : string.Empty;
+            Settings.Default.tckn = cbRemember.Checked ? Common.tckn : string.Empty;
             Settings.Default.Save();
             return true;
         }
@@ -323,11 +323,30 @@ namespace DYS
 
             return mdLink;
         }
+        public IWebElement? GetDysLink()
+        {
+            int tryCount = 0;
+            IWebElement? dsyLink = null;
+            List<IWebElement> flips = WinHelpers.GetElementsBy("c", "image-flip", out msg);
+            while (flips == null)
+            {
+                tryCount++;
+                flips = WinHelpers.GetElementsBy("c", "image-flip", out msg);
+                if (tryCount == 10) { return null; }
+            }
+            foreach (IWebElement flip in flips)
+            {
+                if (flip.Text.Contains("DYS")) { dsyLink = flip; break; }
+            }
+
+            return dsyLink;
+        }
         public void ConfirmMessages()
         {
-            List<IWebElement> flips = WinHelpers.GetElementsBy("c", "image-flip", out msg);
+            IWebElement? dysFlipMenu = GetDysLink();
+            if (dysFlipMenu == null) { lblMessage.Text = "DYS giriþ linki bulunamadý\r\nLütfen daha sonra tekrar deneyin"; Common.driver.Dispose(); return; }
             Actions action = new Actions(Common.driver);
-            action.MoveToElement(flips[2]).Perform();
+            action.MoveToElement(dysFlipMenu).Perform();
 
             int tryCount = 0;
             Thread.Sleep(1000);
@@ -356,7 +375,7 @@ namespace DYS
             if(tree.Count > 9)
             {
                 IWebElement? mdLink = GetMdLink();
-                if (mdLink == null) { lblMessage.Text = "DYS giriþ linki bulunamadý\r\nLütfen daha sonra tekrar deneyin"; Common.driver.Dispose(); return; }
+                if (mdLink == null) { lblMessage.Text = "Ýdareci mesajlarý listelenemdi\r\nLütfen daha sonra tekrar deneyin"; Common.driver.Dispose(); return; }
                 mdLink.Click();
             }
 
@@ -397,16 +416,19 @@ namespace DYS
                     while (iframe == null)
                     {
                         iframe = WinHelpers.GetElementBy("i", "gozdenGecirmeEkraniId", out msg);
-                        Thread.Sleep(1000);
+                        Thread.Sleep(500);
                     }
                     Common.driver.SwitchTo().Frame("gozdenGecirmeEkraniId");
-                    IWebElement? okudum = WinHelpers.GetButtonElementBy("x", "//*[@id=\"formspanel:okudumBtn\"]", out msg);
+
+                    IWebElement? okudum = null;
+                    if (Common.driver.PageSource.Contains("Okudum")) { okudum = WinHelpers.GetButtonElementBy("x", "//*[@id=\"formspanel:okudumBtn\"]", out msg); }
                     if(okudum != null)
                     okudum.Click();
                     else
                     {
-                        IWebElement? tamam = WinHelpers.GetButtonElementBy("x", "//*[@id=\"formspanel:_08001kapat2\"]", out msg);
-                        tamam.Click();
+                        IWebElement? kapat = WinHelpers.GetButtonElementBy("x", "//*[@id=\"formspanel:_08001kapat2\"]", out msg);
+                        if (kapat != null)
+                            kapat.Click();
                         continue;
                     }
 
