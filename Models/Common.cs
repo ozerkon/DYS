@@ -18,6 +18,6 @@ namespace Models
         public static int imageWidth { get; set; }
         public static int maxWait { get; set; } = 20;
         public static Bitmap? bitmap { get; set; }
-        public static IWebDriver? driver { get; set; }
+        public static IWebDriver driver { get; set; }
     }
 }

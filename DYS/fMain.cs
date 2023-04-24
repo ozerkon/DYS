@@ -5,8 +5,10 @@ using Models;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
+using System.ComponentModel;
 using System.Drawing;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace DYS
 {
@@ -281,6 +283,46 @@ namespace DYS
             Settings.Default.Save();
             return true;
         }
+        public IWebElement? GetLoginLink() {
+            int tryCount = 0;
+            IWebElement? dysgiris = null;
+            dysLink = "rptProjeler_ctl02_rptKullanicilar_ctl00_LinkButton1";
+            while (dysgiris == null)
+            {
+                dysgiris = WinHelpers.GetButtonElementBy("i", dysLink, out msg); Thread.Sleep(1000); tryCount++;
+                if (tryCount == 10) { return null; }
+            }
+
+            if (!dysgiris.Text.Contains("DYS WEB"))
+            {
+                dysgiris = null;
+                dysLink = "rptProjeler_ctl02_rptKullanicilar_ctl01_LinkButton1";
+                while (dysgiris == null)
+                {
+                    dysgiris = WinHelpers.GetButtonElementBy("i", dysLink, out msg); Thread.Sleep(1000); tryCount++;
+                    if (tryCount == 10) { return null; }
+                }
+            }
+            return dysgiris;
+        }
+        public IWebElement? GetMdLink()
+        {
+            int tryCount = 0;
+            IWebElement? mdLink = null;
+            while (mdLink == null)
+            {   
+                tryCount++;
+                mdLink = WinHelpers.GetElementBy("i", "menuForm:roller_tree:2", out msg);
+                if (mdLink.Text.Contains("Müdür")){ return mdLink;   }
+                mdLink = WinHelpers.GetElementBy("i", "menuForm:roller_tree:1", out msg);
+                if (mdLink.Text.Contains("Müdür")) { return mdLink; }
+                mdLink = WinHelpers.GetElementBy("i", "menuForm:roller_tree:0", out msg);
+                if (mdLink.Text.Contains("Müdür")) { return mdLink; }
+                if (tryCount == 10) { return null; }
+            }
+
+            return mdLink;
+        }
         public void ConfirmMessages()
         {
             List<IWebElement> flips = WinHelpers.GetElementsBy("c", "image-flip", out msg);
@@ -290,23 +332,40 @@ namespace DYS
             int tryCount = 0;
             Thread.Sleep(1000);
 
-            dysLink = Common.login == "0" ? "rptProjeler_ctl02_rptKullanicilar_ctl00_LinkButton1" : "rptProjeler_ctl02_rptKullanicilar_ctl01_LinkButton1";
-            IWebElement dysgiris = WinHelpers.GetButtonElementBy("i", dysLink, out msg);
+            IWebElement? dysgiris = GetLoginLink();
+            if(dysgiris == null) { lblMessage.Text = "DYS giriþ linki bulunamadý\r\nLütfen daha sonra tekrar deneyin"; Common.driver.Dispose(); return; }
             dysgiris.Click();
 
             if (Common.driver.WindowHandles.Count > 1)
             {
                 Common.driver.SwitchTo().Window(Common.driver.WindowHandles[1]);
+                WinHelpers.WaitForPageLoad(out msg);
             }
-            if(Common.driver.PageSource.Contains("evrak bulunmamaktadýr")) {  lblMessage.Text = "Onaylanmamýþ mesaj yok"; return; }
-            
             tryCount = 0;
+
+            List<IWebElement>? tree = null;
+
+            while (tree == null)
+            {
+                Thread.Sleep(100);
+                tree = Common.driver.FindElements(By.CssSelector("li[id^='menuForm:roller_tree:']")).ToList();
+                tryCount++;
+                if (tryCount == 300) { lblMessage.Text = "Sayfa 30 saniye boyunca yanýt vermediði için iþlem iptal edildi"; Common.driver.Dispose(); return; }
+            }
+
+            if(tree.Count > 9)
+            {
+                IWebElement? mdLink = GetMdLink();
+                if (mdLink == null) { lblMessage.Text = "DYS giriþ linki bulunamadý\r\nLütfen daha sonra tekrar deneyin"; Common.driver.Dispose(); return; }
+                mdLink.Click();
+            }
+
             while (!Common.driver.PageSource.Contains("listelenmektedir"))
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(100);
                 if (Common.driver.PageSource.Contains("evrak bulunmamaktadýr")) { lblMessage.Text = "Onaylanmamýþ mesaj yok"; return; }
                 tryCount++;
-                if(tryCount== 30) { lblMessage.Text = "Sayfa 30 saniye boyunca yanýt vermediði için iþlem iptal edildi"; Common.driver.Dispose(); lblMessage.Text = "Sayfa yanýt vermiyor\r\nLütfen sonra tekrar deneyin"; return; }
+                if(tryCount== 300) { lblMessage.Text = "Sayfa 30 saniye boyunca yanýt vermediði için iþlem iptal edildi"; Common.driver.Dispose(); return; }
             }
             IWebElement isler = WinHelpers.GetElementBy("i", "form:etiketFilter", out msg);
 
@@ -317,30 +376,40 @@ namespace DYS
                 okunmamis = Convert.ToInt32(sayi);
                 IWebElement ilksatir = WinHelpers.GetButtonElementBy("x", "/html/body/div[2]/div[4]/form/div[1]/div/div/div[2]/div/div[2]/table/tbody/tr[1]/td[6]", out msg);
                 ilksatir.Click();
-                while (!Common.driver.PageSource.Contains("Gelen Evrak Gözden Geçirme"))
+                while (!Common.driver.PageSource.Contains("Gelen Evrak Gözden Geçirme") && !Common.driver.PageSource.Contains("Evrak Görüntüleme"))
                 {
                     Thread.Sleep(1000);
                 }
                 for (int i = 0; i < okunmamis; i++)
                 {
-                    while (!Common.driver.PageSource.Contains("Gelen Evrak Gözden Geçirme"))
+                    while (!Common.driver.PageSource.Contains("Gelen Evrak Gözden Geçirme") && !Common.driver.PageSource.Contains("Evrak Görüntüleme"))
                     {
                         Thread.Sleep(100);
                     }
+
                     IList<IWebElement> hiddenElements = Common.driver.FindElements(By.CssSelector("ui-dialog"));
                     foreach (IWebElement item in hiddenElements)
                     {
                         wait.Until(e => ((IJavaScriptExecutor)Common.driver).ExecuteScript("arguments[0].setAttribute('style', 'display:none')", item));
                     }
-                    IWebElement iframe = null;
+
+                    IWebElement? iframe = null;
                     while (iframe == null)
                     {
                         iframe = WinHelpers.GetElementBy("i", "gozdenGecirmeEkraniId", out msg);
                         Thread.Sleep(1000);
                     }
                     Common.driver.SwitchTo().Frame("gozdenGecirmeEkraniId");
-                    IWebElement okudum = WinHelpers.GetButtonElementBy("x", "//*[@id=\"formspanel:okudumBtn\"]", out msg);
+                    IWebElement? okudum = WinHelpers.GetButtonElementBy("x", "//*[@id=\"formspanel:okudumBtn\"]", out msg);
+                    if(okudum != null)
                     okudum.Click();
+                    else
+                    {
+                        IWebElement? tamam = WinHelpers.GetButtonElementBy("x", "//*[@id=\"formspanel:_08001kapat2\"]", out msg);
+                        tamam.Click();
+                        continue;
+                    }
+
                     while (!Common.driver.PageSource.Contains("Gelen Evrak Gözden Geçirme"))
                     {
                         Thread.Sleep(1000);

@@ -110,7 +110,7 @@ namespace DYS.Helpers
             return driver;
 
         }
-        public static IWebElement element { get; set; }
+        public static IWebElement? element { get; set; }
         public static bool isAlertPresent(out string msg)
         {
             msg = "";
@@ -191,7 +191,7 @@ namespace DYS.Helpers
             }
             return elements;
         }
-        public static IWebElement GetButtonElementBy(string t, string tv, out string msg)
+        public static IWebElement? GetButtonElementBy(string t, string tv, out string msg)
         {
             msg = "";
             try
@@ -268,9 +268,22 @@ namespace DYS.Helpers
                 {
                     return true;
                 }
-                Thread.Sleep(100);
+                Thread.Sleep(1000);
             }
             return false;
+        }
+        public static void WaitForPageLoad(out string msg)
+        {
+            msg = "";
+            try
+            {
+                WebDriverWait wait = GetWait();
+                wait.Until(e => ((IJavaScriptExecutor)driver).ExecuteScript("return document.readyState").Equals("complete"));
+            }
+            catch (Exception ex)
+            {
+                msg = ex.Message.ToString();
+            }
         }
         public static void WaitForElement(string type, string element, out string msg)
         {
