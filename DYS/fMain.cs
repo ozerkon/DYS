@@ -130,6 +130,10 @@ namespace DYS
             lblMessage.Text =  string.Empty;
             Common.error = true; Common.loggedIn = false; Common.cancel = false; Common.flipCount = 0;
             Common.driver = WinHelpers.GetWebDriver(Common.hideBrowser, out Common.msg);
+            if(Common.driver == null && Common.msg.Contains("This version of ChromeDriver only supports Chrome version"))
+            {
+                lblMessage.Text = "Chrome sürümü güncel deðil. Lütfen önce google chrome'u güncelleyip tekrar deneyin"; return;
+            }
             Common.wait = new WebDriverWait(Common.driver, TimeSpan.FromSeconds(30));
             lblReport.Text += Common.browser == "0"? "* Firefox baþlatýlýyor...\r\n" : "* Chrome baþlatýlýyor...\r\n";
             Common.driver.Url = "https://mebbis.meb.gov.tr/default.aspx";
@@ -203,7 +207,8 @@ namespace DYS
             }
             else
             {
-                if (Common.confirmError == true)
+                if(lblMessage.Text.Contains("Chrome sürümü güncel deðil")) { }
+                else if (Common.confirmError == true)
                 {
                     lblMessage.Text = Common.isManager ? $"0naylama iþlemi hatalarla tamamlandý.\r\n{Common.totalMessages} adet mesajdan {Common.confirmedMessages} adedi onaylandý\r\n{Common.nonConfirmedMessages} adet mesajý DYS programý ile onaylamanýz gerekli" : $"0naylama iþlemi hatalarla tamamlandý.\r\n{Common.totalMessages} adet mesajdan {Common.confirmedMessages} adedi onaylandý";
                 }
@@ -362,7 +367,6 @@ namespace DYS
                         }
                         continue;
                     }
-
                     while (!Common.driver.PageSource.Contains("Gelen Evrak Gözden Geçirme"))
                     {
                         Thread.Sleep(1000);
@@ -403,7 +407,7 @@ namespace DYS
             gbLoginInfo.Enabled = true;
             btnOnay.Enabled = true;
             Cursor.Current = Cursors.Default;
-            Common.driver.Dispose();
+            if(Common.driver != null) Common.driver.Dispose();
             Width = 335;
         }
         #endregion

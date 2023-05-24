@@ -29,8 +29,8 @@
 
   <ItemGroup>
     <PackageReference Include="DotNetSeleniumExtras.WaitHelpers" Version="3.11.0" />
-    <PackageReference Include="Selenium.WebDriver" Version="4.8.2" />
-    <PackageReference Include="WebDriverManager" Version="2.16.2" />
+    <PackageReference Include="Selenium.WebDriver" Version="4.12.4" />
+    <PackageReference Include="WebDriverManager" Version="2.17.1" />
   </ItemGroup>
 
   <ItemGroup>

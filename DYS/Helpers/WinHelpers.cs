@@ -41,16 +41,17 @@ namespace DYS.Helpers
             switch (Common.browser)
             {
                 case "0":
-                    driver = SetFirefoxOptionsForDownload(hideBrowser);
+                    driver = SetFirefoxOptionsForDownload(hideBrowser, out msg);
                     break;
                 case "1":
-                    driver = SetChromeOptionsForDownload(hideBrowser);
+                    driver = SetChromeOptionsForDownload(hideBrowser, out msg);
                     break;
             }
             return driver;
         }
-        public static IWebDriver SetFirefoxOptionsForDownload(bool hideBrowser)
+        public static IWebDriver SetFirefoxOptionsForDownload(bool hideBrowser, out string msg)
         {
+            msg = "";
             //IWebDriver driver;
             FirefoxOptions firefoxOptions;
             FirefoxProfile firefoxProfile = new FirefoxProfile();
@@ -101,9 +102,9 @@ namespace DYS.Helpers
 
             return driver;
         }
-        public static IWebDriver SetChromeOptionsForDownload(bool hideBrowser)
+        public static IWebDriver SetChromeOptionsForDownload(bool hideBrowser, out string msg)
         {
-            string msg = "";
+            msg = "";
             ChromeOptions chromeOptions;
             ChromeDriverService cDriverService;
 
@@ -137,6 +138,7 @@ namespace DYS.Helpers
             catch (Exception ex)
             {
                 msg = ex.Message;
+                if(msg.Contains("This version of ChromeDriver only supports Chrome version")) { return null; }
                 cDriverService = ChromeDriverService.CreateDefaultService(driverLocation);
                 driver = new ChromeDriver(cDriverService, chromeOptions);
             }
