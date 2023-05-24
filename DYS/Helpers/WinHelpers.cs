@@ -17,21 +17,21 @@ namespace DYS.Helpers
     {
         private static IWebDriver? driver;
         private static WebDriverWait? wait;
-        public static IWebDriver GetWebDriver(out string msg)
+        public static IWebDriver GetWebDriver(bool hideBrowser, out string msg)
         {
             msg = ""; IWebDriver? driver = null;
             switch (Common.browser)
             {
                 case "0":
-                    driver = SetFirefoxOptionsForDownload();
+                    driver = SetFirefoxOptionsForDownload(hideBrowser);
                     break;
                 case "1":
-                    driver = SetChromeOptionsForDownload();
+                    driver = SetChromeOptionsForDownload(hideBrowser);
                     break;
             }
             return driver;
         }
-        public static IWebDriver SetFirefoxOptionsForDownload()
+        public static IWebDriver SetFirefoxOptionsForDownload(bool hideBrowser)
         {
             //IWebDriver driver;
             FirefoxOptions firefoxOptions;
@@ -55,7 +55,16 @@ namespace DYS.Helpers
             firefoxProfile.DeleteAfterUse = true;
 
             firefoxOptions.Profile = firefoxProfile;
-
+            if (hideBrowser)
+            {
+                fDriverService = FirefoxDriverService.CreateDefaultService(Application.StartupPath);
+                fDriverService.HideCommandPromptWindow = true;
+                firefoxOptions.AddArgument("-headless");
+                int sw = Screen.PrimaryScreen.Bounds.Width;
+                firefoxOptions.AddArgument($"--width={sw}");
+                int sh = Screen.PrimaryScreen.Bounds.Height;
+                firefoxOptions.AddArgument($"--height={sh}");
+            }
             try
             {
                 driverLocation = new DriverManager().SetUpDriver(new FirefoxConfig());
@@ -74,7 +83,7 @@ namespace DYS.Helpers
 
             return driver;
         }
-        public static IWebDriver SetChromeOptionsForDownload()
+        public static IWebDriver SetChromeOptionsForDownload(bool hideBrowser)
         {
             string msg = "";
             ChromeOptions chromeOptions;
@@ -92,7 +101,13 @@ namespace DYS.Helpers
             chromeOptions.AddUserProfilePreference("intl.accept_languages", "tr");
             chromeOptions.AddUserProfilePreference("disable-popup-blocking", "true");
 
-
+            if (hideBrowser)
+            {
+                chromeOptions.AddArgument("headless");
+                int sw = Screen.PrimaryScreen.Bounds.Width;
+                int sh = Screen.PrimaryScreen.Bounds.Height;
+                chromeOptions.AddArguments($"window-size={sw},{sh}");
+            }
             try
             {
                 driverLocation = new DriverManager().SetUpDriver(new ChromeConfig());

@@ -20,9 +20,9 @@ namespace DYS
 
         private void fLogin_Load(object sender, EventArgs e)
         {
-            Text = Common.login == "1" ? "Mebbis giriş bilgileri" : "E-devlet giriş bilgileri";
-            lblPass.Text = Common.login == "1" ? "Mebbis şifreniz" : "E-devlet şifreniz";
-            btnRefreshCaptcha.Enabled = Common.login == "1" ? false : true;
+            Text = Common.loginType == "1" ? "Mebbis giriş bilgileri" : "E-devlet giriş bilgileri";
+            lblPass.Text = Common.loginType == "1" ? "Mebbis şifreniz" : "E-devlet şifreniz";
+            btnRefreshCaptcha.Enabled = Common.loginType == "1" ? false : true;
             lblMessage.Text = "";
             gbCaptcha.Enabled = hasCaptcha;
             pbCaptcha.Image = Common.bitmap == null ?  null : Common.bitmap;
@@ -43,7 +43,7 @@ namespace DYS
             else { lblMessage.Text = ""; Common.tckn = textAddTcno.Text.Trim(); }
             if (texPass.Text.Trim() == "")
             {
-                lblMessage.Text = Common.login == "0" ? "Mebbis şifresi girilmedi!" : "E-devlet şifresi girilmedi"; texPass.Focus(); return;
+                lblMessage.Text = Common.loginType == "0" ? "Mebbis şifresi girilmedi!" : "E-devlet şifresi girilmedi"; texPass.Focus(); return;
             }
             else { lblMessage.Text = ""; Common.pass = texPass.Text.Trim(); }
 

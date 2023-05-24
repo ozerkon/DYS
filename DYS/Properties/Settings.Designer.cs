@@ -74,12 +74,24 @@ namespace DYS.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public string login {
+        public string loginType {
             get {
-                return ((string)(this["login"]));
+                return ((string)(this["loginType"]));
             }
             set {
-                this["login"] = value;
+                this["loginType"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool hideBrowser {
+            get {
+                return ((bool)(this["hideBrowser"]));
+            }
+            set {
+                this["hideBrowser"] = value;
             }
         }
     }
