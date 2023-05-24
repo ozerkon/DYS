@@ -341,7 +341,7 @@ namespace DYS
                         iframe = WinHelpers.GetElementBy("i", "gozdenGecirmeEkraniId", out Common.msg);
                         Thread.Sleep(500);
                         if (Common.bgwConfirm.CancellationPending) { return false; }
-                        if (Screen.PrimaryScreen?.Bounds.Height <= 1080)  WinHelpers.ZoomOut();
+                        if (Screen.PrimaryScreen?.Bounds.Height < 1080)  WinHelpers.ZoomOut();
                     }
                     Common.driver.SwitchTo().Frame("gozdenGecirmeEkraniId");
 
