@@ -6,7 +6,6 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using System.ComponentModel;
-using System.Text;
 
 namespace DYS
 {
@@ -15,7 +14,7 @@ namespace DYS
         public fMain()
         {
             InitializeComponent();
-            Width= 335;
+            Width = 335;
         }
         private void fMain_Load(object sender, EventArgs e)
         {
@@ -27,10 +26,18 @@ namespace DYS
             if (Settings.Default.loginType == "0") { rbEdevlet.Checked = true; texPass.Text = Settings.Default.passED; }
             else if (Settings.Default.loginType == "1") { rbMebbis.Checked = true; texPass.Text = Settings.Default.passMEB; }
 
-            cbHideBrowser.Checked = Settings.Default.hideBrowser? true: false;
+            cbHideBrowser.Checked = Settings.Default.hideBrowser ? true : false;
             CheckForIllegalCrossThreadCalls = false;
             BringFront();
 
+            // gecko güncellenince sil
+            rbChrome.Checked = true;
+            Settings.Default.browser = "1";
+            Common.browser = "1";
+            Settings.Default.Save();
+            ToolTip toolTip = new ToolTip();
+            toolTip.SetToolTip(gbBrowser, "Firefox'u çalýþtýran geckodiriver uygulamsýndaki hatadan dolayý geçici olarak devre dýþýdýr.\r\nGeckodriver'ýn yeni sürümü geldiðinde firefox seçeneði tekrar etkin olacaktýr");
+            // gecko güncellenince sil
         }
         private void InitializeBgwConfirm()
         {
@@ -126,16 +133,16 @@ namespace DYS
         #region bgwConfirm
         private void BgwConfirmDoWork(object? sender, DoWorkEventArgs e)
         {
-            e.Cancel = false; 
-            lblMessage.Text =  string.Empty;
+            e.Cancel = false;
+            lblMessage.Text = string.Empty;
             Common.error = true; Common.loggedIn = false; Common.cancel = false; Common.flipCount = 0;
             Common.driver = WinHelpers.GetWebDriver(Common.hideBrowser, out Common.msg);
-            if(Common.driver == null && Common.msg.Contains("This version of ChromeDriver only supports Chrome version"))
+            if (Common.driver == null && Common.msg.Contains("This version of ChromeDriver only supports Chrome version"))
             {
                 lblMessage.Text = "Chrome sürümü güncel deðil. Lütfen önce google chrome'u güncelleyip tekrar deneyin"; return;
             }
             Common.wait = new WebDriverWait(Common.driver, TimeSpan.FromSeconds(30));
-            lblReport.Text += Common.browser == "0"? "* Firefox baþlatýlýyor...\r\n" : "* Chrome baþlatýlýyor...\r\n";
+            lblReport.Text += Common.browser == "0" ? "* Firefox baþlatýlýyor...\r\n" : "* Chrome baþlatýlýyor...\r\n";
             Common.driver.Url = "https://mebbis.meb.gov.tr/default.aspx";
             WinHelpers.WaitForPageLoad(out Common.msg);
             if (Common.bgwConfirm.CancellationPending == true) { e.Cancel = true; return; }
@@ -187,11 +194,12 @@ namespace DYS
                     if (Common.bgwConfirm.CancellationPending == true) { e.Cancel = true; return; }
                 }
             }
-            if (!ConfirmMessages(out Common.msg)) {
-                if (Common.cancelProcess) { btnCancel_Click(btnCancel, new EventArgs()); e.Cancel = true;}
-                 return; 
+            if (!ConfirmMessages(out Common.msg))
+            {
+                if (Common.cancelProcess) { btnCancel_Click(btnCancel, new EventArgs()); e.Cancel = true; }
+                return;
             }
-            
+
         }
         private void BgwConfirmComplated(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -207,14 +215,14 @@ namespace DYS
             }
             else
             {
-                if(lblMessage.Text.Contains("Chrome sürümü güncel deðil")) { }
+                if (lblMessage.Text.Contains("Chrome sürümü güncel deðil")) { }
                 else if (Common.confirmError == true)
                 {
                     lblMessage.Text = Common.isManager ? $"0naylama iþlemi hatalarla tamamlandý.\r\n{Common.totalMessages} adet mesajdan {Common.confirmedMessages} adedi onaylandý\r\n{Common.nonConfirmedMessages} adet mesajý DYS programý ile onaylamanýz gerekli" : $"0naylama iþlemi hatalarla tamamlandý.\r\n{Common.totalMessages} adet mesajdan {Common.confirmedMessages} adedi onaylandý";
                 }
-                else if(Common.totalMessages > 0)
+                else if (Common.totalMessages > 0)
                 {
-                    lblMessage.Text = Common.isManager? $"0naylama iþlemi hatasýz tamamlandý.\r\n{Common.confirmedMessages} adet mesaj onaylandý\r\n{Common.nonConfirmedMessages} adet mesajý DYS programý ile onaylamanýz gerekli" : $"0naylama iþlemi hatasýz tamamlandý.\r\n{Common.confirmedMessages} adet mesaj onaylandý";
+                    lblMessage.Text = Common.isManager ? $"0naylama iþlemi hatasýz tamamlandý.\r\n{Common.confirmedMessages} adet mesaj onaylandý\r\n{Common.nonConfirmedMessages} adet mesajý DYS programý ile onaylamanýz gerekli" : $"0naylama iþlemi hatasýz tamamlandý.\r\n{Common.confirmedMessages} adet mesaj onaylandý";
 
                 }
                 else if (Common.totalMessages == 0)
@@ -257,18 +265,18 @@ namespace DYS
             }
 
             IWebElement? dysFlipMenu = GetDysLink();
-            if (dysFlipMenu == null) { lblMessage.Text = "DYS giriþ linki bulunamadý\r\nLütfen daha sonra tekrar deneyin"; Common.driver.Dispose();  return false; }
+            if (dysFlipMenu == null) { lblMessage.Text = "DYS giriþ linki bulunamadý\r\nLütfen daha sonra tekrar deneyin"; Common.driver.Dispose(); return false; }
             Actions action = new Actions(Common.driver);
             action.MoveToElement(dysFlipMenu).Perform();
 
             int tryCount = 0;
             Thread.Sleep(1000);
-            if (Common.bgwConfirm.CancellationPending ) { return false; }
+            if (Common.bgwConfirm.CancellationPending) { return false; }
             IWebElement? dysgiris = GetLoginLink();
             if (dysgiris == null) { lblMessage.Text = "DYS giriþ linki bulunamadý\r\nLütfen daha sonra tekrar deneyin"; Common.driver.Dispose(); return false; }
             dysgiris.Click();
 
-            
+
 
             if (Common.driver.WindowHandles.Count > 1)
             {
@@ -291,7 +299,7 @@ namespace DYS
 
             if (tree.Count > 9)
             {
-                Common.isManager= true;
+                Common.isManager = true;
                 Common.mdLink = GetMdLink();
                 if (Common.mdLink == null) { lblMessage.Text = "Ýdareci mesajlarý listelenemdi\r\nLütfen daha sonra tekrar deneyin"; Common.driver.Dispose(); return false; }
                 Common.mdLink.Click();
@@ -309,7 +317,7 @@ namespace DYS
             IWebElement isler = WinHelpers.GetElementBy("i", "form:etiketFilter", out Common.msg);
 
             string sayi = isler.Text.Substring(23, isler.Text.Substring(23).IndexOf(" "));
-            
+
             try
             {
                 Common.totalMessages = Convert.ToInt32(sayi);
@@ -346,24 +354,27 @@ namespace DYS
                         iframe = WinHelpers.GetElementBy("i", "gozdenGecirmeEkraniId", out Common.msg);
                         Thread.Sleep(500);
                         if (Common.bgwConfirm.CancellationPending) { return false; }
-                        if (Screen.PrimaryScreen?.Bounds.Height < 1080)  WinHelpers.ZoomOut();
+                        if (Screen.PrimaryScreen?.Bounds.Height < 1080) WinHelpers.ZoomOut();
                     }
                     Common.driver.SwitchTo().Frame("gozdenGecirmeEkraniId");
 
                     IWebElement? okudum = null;
                     if (Common.driver.PageSource.Contains("Okudum")) { okudum = WinHelpers.GetButtonElementBy("x", "//*[@id=\"formspanel:okudumBtn\"]", out Common.msg); }
-                    if (okudum != null) { 
+                    if (okudum != null)
+                    {
                         okudum.Click();
                         Common.confirmedMessages++;
                         pbProcess.Value = Common.confirmedMessages;
-                        if (Common.bgwConfirm.CancellationPending) { return false; } }
+                        if (Common.bgwConfirm.CancellationPending) { return false; }
+                    }
                     else
                     {
                         IWebElement? kapat = WinHelpers.GetButtonElementBy("x", "//*[@id=\"formspanel:_08001kapat2\"]", out Common.msg);
-                        if (kapat != null) { 
-                            kapat.Click(); 
+                        if (kapat != null)
+                        {
+                            kapat.Click();
                             Common.nonConfirmedMessages++;
-                            if (Common.bgwConfirm.CancellationPending) { return false; } 
+                            if (Common.bgwConfirm.CancellationPending) { return false; }
                         }
                         continue;
                     }
@@ -385,8 +396,8 @@ namespace DYS
         private void ProcessStarted()
         {
             Common.totalMessages = 0;
-            Common.confirmedMessages= 0;
-            Common.nonConfirmedMessages= 0;
+            Common.confirmedMessages = 0;
+            Common.nonConfirmedMessages = 0;
             Common.confirmError = false;
             Common.isManager = false;
             Cursor.Current = Cursors.WaitCursor;
@@ -407,7 +418,7 @@ namespace DYS
             gbLoginInfo.Enabled = true;
             btnOnay.Enabled = true;
             Cursor.Current = Cursors.Default;
-            if(Common.driver != null) Common.driver.Dispose();
+            if (Common.driver != null) Common.driver.Dispose();
             Width = 335;
         }
         #endregion

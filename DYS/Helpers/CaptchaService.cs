@@ -10,7 +10,7 @@ namespace DYS.Captcha
         public static IWebElement captchaPic { get; set; }
         public static string captchaFilePath = Path.GetTempPath();
         public static string LastCaptchaPath = Path.GetTempPath();
-        public static Bitmap TakeScreenshot(IWebElement element, out string msg)
+        public static Bitmap? TakeScreenshot(IWebElement element, out string msg)
         {
             msg = "";
             try

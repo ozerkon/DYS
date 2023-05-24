@@ -237,7 +237,7 @@ namespace DYS
         public void WaitForImageLoad(string element, out string msg, string method = "XPath")
         {
             msg = "";
-            IWebElement Image = null;
+            IWebElement? Image = null;
             try
             {
                 IWebElement e = WinHelpers.GetElementBy(method, element, out msg);
