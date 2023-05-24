@@ -38,6 +38,7 @@ namespace DYS
             Common.bgwConfirm.DoWork += new DoWorkEventHandler(BgwConfirmDoWork);
             Common.bgwConfirm.RunWorkerCompleted += new RunWorkerCompletedEventHandler(BgwConfirmComplated);
         }
+
         #region controls
         private void btnOnay_Click(object sender, EventArgs e)
         {
@@ -186,9 +187,9 @@ namespace DYS
                 if (Common.cancelProcess) { btnCancel_Click(btnCancel, new EventArgs()); e.Cancel = true;}
                  return; 
             }
-            Common.driver.Dispose();
+            
         }
-        private void textAddTcno_KeyPress(object sender, KeyPressEventArgs e)
+        private void BgwConfirmComplated(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Error != null)
             {
@@ -402,6 +403,7 @@ namespace DYS
             gbLoginInfo.Enabled = true;
             btnOnay.Enabled = true;
             Cursor.Current = Cursors.Default;
+            Common.driver.Dispose();
             Width = 335;
         }
         #endregion
