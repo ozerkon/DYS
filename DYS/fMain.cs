@@ -20,6 +20,8 @@ namespace DYS
         string tcknCaptcha = "";
         string btnLogin = "";
         string dysLink = "";
+        bool cancel = false;
+        int flipCount = 0;
 
         IWebElement tcknWE;
         IWebElement passWE;
@@ -50,16 +52,17 @@ namespace DYS
         }
         private void btnOnay_Click(object sender, EventArgs e)
         {
-            error = true; logged = false;
-            if (textAddTcno.Text.Trim() == "" || textAddTcno.Text.Length != 11) { 
-                lblMessage.Text = "TC Kimlik numarasý hatalý!"; textAddTcno.Focus();  return; 
+            error = true; logged = false; cancel = false; flipCount = 0;
+            if (textAddTcno.Text.Trim() == "" || textAddTcno.Text.Length != 11)
+            {
+                lblMessage.Text = "TC Kimlik numarasý hatalý!"; textAddTcno.Focus(); return;
             }
             else { lblMessage.Text = ""; Common.tckn = textAddTcno.Text.Trim(); }
-            if (texPass.Text.Trim() == "" )
+            if (texPass.Text.Trim() == "")
             {
-                 lblMessage.Text = rbMebbis.Checked?  "Mebbis þifresi girilmedi!" : "E-devlet þifresi girilmedi"; texPass.Focus(); return;
+                lblMessage.Text = rbMebbis.Checked ? "Mebbis þifresi girilmedi!" : "E-devlet þifresi girilmedi"; texPass.Focus(); return;
             }
-            else {  lblMessage.Text = ""; Common.pass = texPass.Text.Trim(); }
+            else { lblMessage.Text = ""; Common.pass = texPass.Text.Trim(); }
 
             Common.driver = WinHelpers.GetWebDriver(out msg);
             wait = new WebDriverWait(Common.driver, TimeSpan.FromSeconds(30));
@@ -93,7 +96,7 @@ namespace DYS
                 {
                     logged = EdevletGiris();
                     tryCount++;
-                    if(tryCount == 4) { lblMessage.Text = "Oturum açma baþarýsýz oldu."; return; }
+                    if (tryCount == 4 || cancel) { lblMessage.Text = "Oturum açma baþarýsýz oldu."; return; }
                 }
             }
             else
@@ -108,7 +111,7 @@ namespace DYS
                 {
                     logged = MebbisGiris();
                     tryCount++;
-                    if (tryCount == 4) { lblMessage.Text = "Oturum açma baþarýsýz oldu."; return; }
+                    if (tryCount == 4 || cancel) { lblMessage.Text = "Oturum açma baþarýsýz oldu."; return; }
                 }
             }
             ConfirmMessages();
@@ -168,7 +171,7 @@ namespace DYS
             passWE.Clear();
             passWE.SendKeys(Common.pass);
             giris = WinHelpers.GetButtonElementBy("n", btnLogin, out msg);
-            if(Common.driver.PageSource.Contains("Güvenlik Kodu"))
+            if (Common.driver.PageSource.Contains("Güvenlik Kodu"))
             {
                 captchaWE = WinHelpers.GetElementBy("i", tcknCaptcha, out msg);
                 captchaWE.Clear();
@@ -183,13 +186,13 @@ namespace DYS
             }
             if (Common.driver.PageSource.Contains("Üst üste baþarýsýz giriþ"))
             {
-                MessageBox.Show($"Üst üste baþarýsýz giriþ denemeleri yaptýðýnýz için hesabýnýz bir saatliðine askýya alýnmýþtýr. Lütfen daha sonra tekrar deneyiniz ya da Mebbis þifresi ile giriþ yapýnýz.", "E-devlet giriþ hatasý!"); error = false; logged = false;  return false;
+                MessageBox.Show($"Üst üste baþarýsýz giriþ denemeleri yaptýðýnýz için hesabýnýz bir saatliðine askýya alýnmýþtýr. Lütfen daha sonra tekrar deneyiniz ya da Mebbis þifresi ile giriþ yapýnýz.", "E-devlet giriþ hatasý!"); error = false; logged = false; return false;
             }
 
             if (Common.driver.PageSource.Contains("Kimlik no veya þifre hatalýdýr") || Common.driver.PageSource.Contains("Lütfen formdaki hatalý alanlarý düzelterek yeniden deneyiniz"))
             {
                 Common.tckn = ""; Common.pass = ""; fLogin f; error = true;
-                
+
                 if (Common.driver.PageSource.Contains("Güvenlik Kodu"))
                 {
                     Common.captchaType = "x";
@@ -220,11 +223,11 @@ namespace DYS
                     f = new fLogin(false);
                 }
                 if (f.ShowDialog() == DialogResult.OK) EdevletGiris();
-                else { error = false; logged = false; Common.driver.Dispose(); lblMessage.Text = "Ýþlem iptal edildi"; return false; }
+                else { error = false; logged = false; Common.driver.Dispose(); lblMessage.Text = "Ýþlem iptal edildi"; cancel = true; return false; }
             }
             logged = true;
-            Settings.Default.passED = cbRemember.Checked? Common.pass: string.Empty;
-            Settings.Default.tckn = cbRemember.Checked? Common.tckn: string.Empty;
+            Settings.Default.passED = cbRemember.Checked ? Common.pass : string.Empty;
+            Settings.Default.tckn = cbRemember.Checked ? Common.tckn : string.Empty;
             Settings.Default.Save();
             return true;
         }
@@ -253,12 +256,13 @@ namespace DYS
                 {
                     f = new fLogin(true);
                 }
-                if (f.ShowDialog() == DialogResult.OK) {
+                if (f.ShowDialog() == DialogResult.OK)
+                {
                     captchaWE = WinHelpers.GetElementBy("i", tcknCaptcha, out msg);
                     captchaWE.Clear();
                     captchaWE.SendKeys(Common.captcha);
                 }
-                else { error = false; logged = false; Common.driver.Dispose(); lblMessage.Text = "Ýþlem iptal edildi"; return false; }
+                else { error = false; logged = false; Common.driver.Dispose(); lblMessage.Text = "Ýþlem iptal edildi"; cancel = true; return false; }
             }
             tcknWE = WinHelpers.GetElementBy("i", tcknTbID, out msg);
             tcknWE.Clear();
@@ -268,25 +272,27 @@ namespace DYS
             passWE.SendKeys(Common.pass);
             giris = WinHelpers.GetButtonElementBy("n", btnLogin, out msg);
             giris.Click();
-            
+
             WaitForPageLoad(out msg);
             if (Common.driver.PageSource.Contains("Güvenlik Kodunu Yanlýþ Girdiniz"))
             {
                 lblMessage.Text = "Güvenlik kodu yanlýþ girildi"; error = true; logged = false; MebbisGiris();
-            }else if(Common.driver.PageSource.Contains("Kullanýcý Adý veya Þifre yanlýþ"))
+            }
+            else if (Common.driver.PageSource.Contains("Kullanýcý Adý veya Þifre yanlýþ"))
             {
                 lblMessage.Text = "Kullanýcý adý veya þifre yanlýþ"; error = true; logged = false; MebbisGiris();
             }
-            logged= true;
+            logged = true;
             Settings.Default.passMEB = cbRemember.Checked ? Common.pass : string.Empty;
             Settings.Default.tckn = cbRemember.Checked ? Common.tckn : string.Empty;
             Settings.Default.Save();
             return true;
         }
-        public IWebElement? GetLoginLink() {
+        public IWebElement? GetLoginLink()
+        {
             int tryCount = 0;
             IWebElement? dysgiris = null;
-            dysLink = "rptProjeler_ctl02_rptKullanicilar_ctl00_LinkButton1";
+            dysLink = $"rptProjeler_ctl0{flipCount}_rptKullanicilar_ctl00_LinkButton1";
             while (dysgiris == null)
             {
                 dysgiris = WinHelpers.GetButtonElementBy("i", dysLink, out msg); Thread.Sleep(1000); tryCount++;
@@ -296,7 +302,7 @@ namespace DYS
             if (!dysgiris.Text.Contains("DYS WEB"))
             {
                 dysgiris = null;
-                dysLink = "rptProjeler_ctl02_rptKullanicilar_ctl01_LinkButton1";
+                dysLink = $"rptProjeler_ctl0{flipCount}_rptKullanicilar_ctl01_LinkButton1";
                 while (dysgiris == null)
                 {
                     dysgiris = WinHelpers.GetButtonElementBy("i", dysLink, out msg); Thread.Sleep(1000); tryCount++;
@@ -310,10 +316,10 @@ namespace DYS
             int tryCount = 0;
             IWebElement? mdLink = null;
             while (mdLink == null)
-            {   
+            {
                 tryCount++;
                 mdLink = WinHelpers.GetElementBy("i", "menuForm:roller_tree:2", out msg);
-                if (mdLink.Text.Contains("Müdür")){ return mdLink;   }
+                if (mdLink.Text.Contains("Müdür")) { return mdLink; }
                 mdLink = WinHelpers.GetElementBy("i", "menuForm:roller_tree:1", out msg);
                 if (mdLink.Text.Contains("Müdür")) { return mdLink; }
                 mdLink = WinHelpers.GetElementBy("i", "menuForm:roller_tree:0", out msg);
@@ -337,6 +343,7 @@ namespace DYS
             foreach (IWebElement flip in flips)
             {
                 if (flip.Text.Contains("DYS")) { dsyLink = flip; break; }
+                else { flipCount++; }
             }
 
             return dsyLink;
@@ -352,7 +359,7 @@ namespace DYS
             Thread.Sleep(1000);
 
             IWebElement? dysgiris = GetLoginLink();
-            if(dysgiris == null) { lblMessage.Text = "DYS giriþ linki bulunamadý\r\nLütfen daha sonra tekrar deneyin"; Common.driver.Dispose(); return; }
+            if (dysgiris == null) { lblMessage.Text = "DYS giriþ linki bulunamadý\r\nLütfen daha sonra tekrar deneyin"; Common.driver.Dispose(); return; }
             dysgiris.Click();
 
             if (Common.driver.WindowHandles.Count > 1)
@@ -372,7 +379,7 @@ namespace DYS
                 if (tryCount == 300) { lblMessage.Text = "Sayfa 30 saniye boyunca yanýt vermediði için iþlem iptal edildi"; Common.driver.Dispose(); return; }
             }
 
-            if(tree.Count > 9)
+            if (tree.Count > 9)
             {
                 IWebElement? mdLink = GetMdLink();
                 if (mdLink == null) { lblMessage.Text = "Ýdareci mesajlarý listelenemdi\r\nLütfen daha sonra tekrar deneyin"; Common.driver.Dispose(); return; }
@@ -384,7 +391,7 @@ namespace DYS
                 Thread.Sleep(100);
                 if (Common.driver.PageSource.Contains("evrak bulunmamaktadýr")) { lblMessage.Text = "Onaylanmamýþ mesaj yok"; return; }
                 tryCount++;
-                if(tryCount== 300) { lblMessage.Text = "Sayfa 30 saniye boyunca yanýt vermediði için iþlem iptal edildi"; Common.driver.Dispose(); return; }
+                if (tryCount == 300) { lblMessage.Text = "Sayfa 30 saniye boyunca yanýt vermediði için iþlem iptal edildi"; Common.driver.Dispose(); return; }
             }
             IWebElement isler = WinHelpers.GetElementBy("i", "form:etiketFilter", out msg);
 
@@ -422,8 +429,8 @@ namespace DYS
 
                     IWebElement? okudum = null;
                     if (Common.driver.PageSource.Contains("Okudum")) { okudum = WinHelpers.GetButtonElementBy("x", "//*[@id=\"formspanel:okudumBtn\"]", out msg); }
-                    if(okudum != null)
-                    okudum.Click();
+                    if (okudum != null)
+                        okudum.Click();
                     else
                     {
                         IWebElement? kapat = WinHelpers.GetButtonElementBy("x", "//*[@id=\"formspanel:_08001kapat2\"]", out msg);
@@ -437,7 +444,7 @@ namespace DYS
                         Thread.Sleep(1000);
                     }
                 }
-                lblMessage.Text= "Bütün mesajlar onaylandý";
+                lblMessage.Text = "Bütün mesajlar onaylandý";
             }
             catch (Exception ex)
             {
