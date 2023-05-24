@@ -38,6 +38,12 @@ namespace Models
         public static IWebElement? mdLink;
         public static IWebElement? ilksatir;
 
+        public static bool mebAjandaActive = false;
+        public static IWebElement? mebAjandaText;
+        public static IWebElement? mebAjandaDontAsk;
+        public static IWebElement? mebAjandaButton;
+
+
         public static Regex rx = new Regex(@"[0-9]{1}[0-9]{9}[02468]{1}");
         public static string? msg;
         public static WebDriverWait? wait = null;

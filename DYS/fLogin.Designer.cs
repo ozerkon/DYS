@@ -39,7 +39,7 @@
             this.pbCaptcha = new System.Windows.Forms.PictureBox();
             this.btnRefreshCaptcha = new System.Windows.Forms.Button();
             this.txtCaptcha = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.lblCode = new System.Windows.Forms.Label();
             this.btnLogin = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.lblMessage = new System.Windows.Forms.Label();
@@ -103,7 +103,7 @@
             this.gbCaptcha.Controls.Add(this.panel1);
             this.gbCaptcha.Controls.Add(this.btnRefreshCaptcha);
             this.gbCaptcha.Controls.Add(this.txtCaptcha);
-            this.gbCaptcha.Controls.Add(this.label1);
+            this.gbCaptcha.Controls.Add(this.lblCode);
             this.gbCaptcha.Location = new System.Drawing.Point(16, 119);
             this.gbCaptcha.Name = "gbCaptcha";
             this.gbCaptcha.Size = new System.Drawing.Size(291, 181);
@@ -148,14 +148,14 @@
             this.txtCaptcha.Size = new System.Drawing.Size(140, 23);
             this.txtCaptcha.TabIndex = 2;
             // 
-            // label1
+            // lblCode
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(15, 117);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(84, 15);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Güvenlik Kodu";
+            this.lblCode.AutoSize = true;
+            this.lblCode.Location = new System.Drawing.Point(15, 117);
+            this.lblCode.Name = "lblCode";
+            this.lblCode.Size = new System.Drawing.Size(84, 15);
+            this.lblCode.TabIndex = 0;
+            this.lblCode.Text = "Güvenlik Kodu";
             // 
             // btnLogin
             // 
@@ -181,6 +181,7 @@
             this.btnCancel.Text = "VAZGEÇ";
             this.btnCancel.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // lblMessage
             // 
@@ -233,7 +234,7 @@
         private GroupBox gbCaptcha;
         private PictureBox pbCaptcha;
         private TextBox txtCaptcha;
-        private Label label1;
+        private Label lblCode;
         private Button btnLogin;
         private Button btnRefreshCaptcha;
         private Button btnCancel;

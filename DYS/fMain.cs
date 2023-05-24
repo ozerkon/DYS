@@ -42,6 +42,7 @@ namespace DYS
         private void btnOnay_Click(object sender, EventArgs e)
         {
             Common.bgwConfirm = new BackgroundWorker();
+            Common.mebAjandaActive = false;
             InitializeBgwConfirm();
             if (textAddTcno.Text.Trim() == "" || textAddTcno.Text.Length != 11 || !Common.rx.IsMatch(textAddTcno.Text.Trim()))
             {
@@ -65,7 +66,7 @@ namespace DYS
         private void btnCancel_Click(object sender, EventArgs e)
         {
             Common.cancelProcess = true;
-            lblReport.Text += "ÝPTAL TALEBÝ ALINDI! LÜTFEN BEKLEYÝNÝZ\r\n";
+            lblReport.Text += "\r\nÝPTAL TALEBÝ ALINDI! LÜTFEN BEKLEYÝNÝZ\r\n";
             btnCancel.Text = "ONAYLAMA ÝÞLEMÝ ÝPTAL EDÝLÝYOR...";
             btnCancel.Enabled = false;
             if (Common.bgwConfirm.IsBusy)
@@ -181,10 +182,13 @@ namespace DYS
                     if (Common.bgwConfirm.CancellationPending == true) { e.Cancel = true; return; }
                 }
             }
-            if (ConfirmMessages(out Common.msg)) { e.Cancel = true; return; }
+            if (!ConfirmMessages(out Common.msg)) {
+                if (Common.cancelProcess) { btnCancel_Click(btnCancel, new EventArgs()); e.Cancel = true;}
+                 return; 
+            }
             Common.driver.Dispose();
         }
-        private void BgwConfirmComplated(object sender, RunWorkerCompletedEventArgs e)
+        private void textAddTcno_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.Error != null)
             {
@@ -221,6 +225,31 @@ namespace DYS
         {
             lblReport.Text += "* mebbis.meb.gov.tr sayfasý açýldý.\r\n";
             msg = "";
+            WinHelpers.WaitForPageLoad(out Common.msg);
+            if (Common.driver.PageSource.Contains("Doðrulamasý Aktif"))
+            {
+                Common.mebAjandaActive = true;
+                fLogin f = new fLogin(true);
+                while (Common.driver.PageSource.Contains("Doðrulamasý Aktif") || Common.driver.PageSource.Contains("Doðrulama Gerçekleþmedi"))
+                {
+                    if (f.ShowDialog() == DialogResult.OK)
+                    {
+                        Common.mebAjandaText = WinHelpers.GetElementBy("i", "txtDogrulamaKodu", out Common.msg);
+                        Common.mebAjandaButton = WinHelpers.GetElementBy("i", "btnDogrula", out Common.msg);
+                        if (Common.mebAjandaText != null && Common.mebAjandaButton != null)
+                        {
+                            Common.mebAjandaText.Clear();
+                            Common.mebAjandaText.SendKeys(Common.captcha);
+                            Common.mebAjandaButton.Click();
+                        }
+                    }
+                    else
+                    {
+                        lblMessage.Text = "Ýþlem iptal edildi"; Common.driver.Dispose(); return false;
+                    }
+                }
+            }
+
             IWebElement? dysFlipMenu = GetDysLink();
             if (dysFlipMenu == null) { lblMessage.Text = "DYS giriþ linki bulunamadý\r\nLütfen daha sonra tekrar deneyin"; Common.driver.Dispose();  return false; }
             Actions action = new Actions(Common.driver);
@@ -232,6 +261,8 @@ namespace DYS
             IWebElement? dysgiris = GetLoginLink();
             if (dysgiris == null) { lblMessage.Text = "DYS giriþ linki bulunamadý\r\nLütfen daha sonra tekrar deneyin"; Common.driver.Dispose(); return false; }
             dysgiris.Click();
+
+            
 
             if (Common.driver.WindowHandles.Count > 1)
             {
@@ -279,14 +310,14 @@ namespace DYS
                 pbProcess.Maximum = Common.totalMessages;
                 lblReport.Text += $"* {Common.totalMessages} adet okunmamýþ mesaj bulundu.\r\n";
                 Common.ilksatir = WinHelpers.GetButtonElementBy("x", "/html/body/div[2]/div[4]/form/div[1]/div/div/div[2]/div/div[2]/table/tbody/tr[1]/td[6]", out Common.msg);
-                Common.ilksatir.Click();
+                Common.ilksatir?.Click();
                 while (!Common.driver.PageSource.Contains("Gelen Evrak Gözden Geçirme") && !Common.driver.PageSource.Contains("Evrak Görüntüleme"))
                 {
                     Thread.Sleep(1000);
                     if (Common.bgwConfirm.CancellationPending) { return false; }
                 }
 
-                lblReport.Text += "* Onaylama iþlemi baþlatýlýyor...";
+                lblReport.Text += "* Onaylama iþlemi baþlatýlýyor...\r\n";
 
                 for (int i = 0; i < Common.totalMessages; i++)
                 {
@@ -299,7 +330,7 @@ namespace DYS
                     IList<IWebElement> hiddenElements = Common.driver.FindElements(By.CssSelector("ui-dialog"));
                     foreach (IWebElement item in hiddenElements)
                     {
-                        Common.wait.Until(e => ((IJavaScriptExecutor)Common.driver).ExecuteScript("arguments[0].setAttribute('style', 'display:none')", item));
+                        Common.wait?.Until(e => ((IJavaScriptExecutor)Common.driver).ExecuteScript("arguments[0].setAttribute('style', 'display:none')", item));
                         if (Common.bgwConfirm.CancellationPending) { return false; }
                     }
 
@@ -309,6 +340,7 @@ namespace DYS
                         iframe = WinHelpers.GetElementBy("i", "gozdenGecirmeEkraniId", out Common.msg);
                         Thread.Sleep(500);
                         if (Common.bgwConfirm.CancellationPending) { return false; }
+                        if (Screen.PrimaryScreen?.Bounds.Height <= 1080)  WinHelpers.ZoomOut();
                     }
                     Common.driver.SwitchTo().Frame("gozdenGecirmeEkraniId");
 

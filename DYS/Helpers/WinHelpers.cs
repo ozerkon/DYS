@@ -17,6 +17,24 @@ namespace DYS.Helpers
     {
         private static IWebDriver? driver;
         private static WebDriverWait? wait;
+        private static int ZoomValue = 100;
+        private static int ZoomIncrement = 25;
+
+        public static void ZoomIn()
+        {
+            ZoomValue += ZoomIncrement;
+            Zoom(ZoomValue);
+        }
+        public static void ZoomOut()
+        {
+            ZoomValue -= ZoomIncrement;
+            Zoom(ZoomValue);
+        }
+        private static void Zoom(int level)
+        {
+            WebDriverWait wait = GetWait();
+            wait.Until(e => ((IJavaScriptExecutor)driver).ExecuteScript(string.Format("document.body.style.zoom='{0}%'", level)));
+        }
         public static IWebDriver GetWebDriver(bool hideBrowser, out string msg)
         {
             msg = ""; IWebDriver? driver = null;

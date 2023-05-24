@@ -26,7 +26,19 @@ namespace DYS
             lblMessage.Text = "";
             gbCaptcha.Enabled = hasCaptcha;
             pbCaptcha.Image = Common.bitmap == null ?  null : Common.bitmap;
-            if(hasCaptcha) CenterImage();
+            if(hasCaptcha && Common.bitmap != null) CenterImage();
+
+            if (Common.mebAjandaActive)
+            {
+                gbLoginInfo.Enabled = false;
+                btnRefreshCaptcha.Enabled = false;
+                gbCaptcha.Text = "Meb Ajanda Doğrulama Kodu Girişi";
+                lblCode.Text = "Doğrulama Kodu";
+                txtCaptcha.Focus();
+                txtCaptcha.SelectAll();
+            }
+            else { gbCaptcha.Text = "Güvenlik Kodu Girişi"; lblCode.Text = "Güvenlik Kodu"; }
+            
         }
         private void CenterImage()
         {
@@ -36,12 +48,12 @@ namespace DYS
         }
         private void btnLogin_Click(object sender, EventArgs e)
         {
-            if (textAddTcno.Text.Trim() == "" || textAddTcno.Text.Length != 11)
+            if (!Common.mebAjandaActive && (textAddTcno.Text.Trim() == "" || textAddTcno.Text.Length != 11) )
             {
                 lblMessage.Text = "TC Kimlik numarası hatalı!"; textAddTcno.Focus(); return;
             }
             else { lblMessage.Text = ""; Common.tckn = textAddTcno.Text.Trim(); }
-            if (texPass.Text.Trim() == "")
+            if (!Common.mebAjandaActive && texPass.Text.Trim() == "")
             {
                 lblMessage.Text = Common.loginType == "0" ? "Mebbis şifresi girilmedi!" : "E-devlet şifresi girilmedi"; texPass.Focus(); return;
             }
@@ -49,7 +61,7 @@ namespace DYS
 
             if (hasCaptcha && txtCaptcha.Text.Trim() == "")
             {
-                lblMessage.Text = "Güvenlik kodu!"; txtCaptcha.Focus(); return;
+                lblMessage.Text = "Kod girilmedi!"; txtCaptcha.Focus(); return;
             }
             else { lblMessage.Text = ""; Common.captcha = txtCaptcha.Text.Trim(); }
             DialogResult = DialogResult.OK;
@@ -253,6 +265,11 @@ namespace DYS
                 }
             }
             catch (NoSuchElementException) { }
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            Common.cancelProcess = true;
         }
     }
 }
