@@ -8,4 +8,4 @@ Beni hatırla seçeneği aktifken bir kez başarılı oturum açıldığında gi
 
 Programın yüklendiği bilgisayarın güvenliğinden kullanıcı sorumludur.
 
-Tamamen ücretsizdir. İsterseniz FAST ile eposta hesabım üzerinden bir kahve ısmarlayabilisiniz :)
+Tamamen ücretsizdir. İsterseniz FAST ile eposta hesabım ( ozerkon@gmail.com ) üzerinden bir kahve ısmarlayabilisiniz :)
