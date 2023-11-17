@@ -9,9 +9,9 @@ namespace DYS
     public partial class fLogin : Form
     {
         private bool hasCaptcha = false;
-        public IWebElement weCaptchaImg { get; set; }
-        public IWebElement clickElement { get; set; }
-        
+        public IWebElement? weCaptchaImg { get; set; }
+        public IWebElement? clickElement { get; set; }
+
         public fLogin(bool _hasCaptcha = false)
         {
             InitializeComponent();
@@ -20,13 +20,24 @@ namespace DYS
 
         private void fLogin_Load(object sender, EventArgs e)
         {
-            Text = Common.loginType == "1" ? "Mebbis giriş bilgileri" : "E-devlet giriş bilgileri";
-            lblPass.Text = Common.loginType == "1" ? "Mebbis şifreniz" : "E-devlet şifreniz";
+            BringFront();
+            if (Common.loginType == "0")
+            {
+                Text = "E-devlet giriş bilgileri";
+                lblPass.Text = "E-devlet şifreniz";
+            }
+            else if (Common.loginType == "1")
+            {
+                Text = "Mebbis giriş bilgileri";
+                lblPass.Text = "Mebbis şifreniz";
+                txtCaptcha.MaxLength = 6;
+            }
+
             btnRefreshCaptcha.Enabled = Common.loginType == "1" ? false : true;
             lblMessage.Text = "";
             gbCaptcha.Enabled = hasCaptcha;
-            pbCaptcha.Image = Common.bitmap == null ?  null : Common.bitmap;
-            if(hasCaptcha && Common.bitmap != null) CenterImage();
+            pbCaptcha.Image = Common.bitmap == null ? null : Common.bitmap;
+            if (hasCaptcha && Common.bitmap != null) CenterImage();
 
             if (Common.mebAjandaActive)
             {
@@ -38,7 +49,7 @@ namespace DYS
                 txtCaptcha.SelectAll();
             }
             else { gbCaptcha.Text = "Güvenlik Kodu Girişi"; lblCode.Text = "Güvenlik Kodu"; }
-            
+
         }
         private void CenterImage()
         {
@@ -48,7 +59,8 @@ namespace DYS
         }
         private void btnLogin_Click(object sender, EventArgs e)
         {
-            if (!Common.mebAjandaActive && (textAddTcno.Text.Trim() == "" || textAddTcno.Text.Length != 11) )
+            Common.tryCount = 0;
+            if (!Common.mebAjandaActive && (textAddTcno.Text.Trim() == "" || textAddTcno.Text.Length != 11))
             {
                 lblMessage.Text = "TC Kimlik numarası hatalı!"; textAddTcno.Focus(); return;
             }
@@ -78,7 +90,6 @@ namespace DYS
                 e.Handled = true;
             }
         }
-
         private void textAddTcno_TextChanged(object sender, EventArgs e)
         {
             if (textAddTcno.Text.Trim() == "")
@@ -90,10 +101,11 @@ namespace DYS
 
         private void btnRefreshCaptcha_Click(object sender, EventArgs e)
         {
-            string msg = ""; string srcBefore = String.Empty; string srcAfter = String.Empty;
+            string srcBefore = String.Empty; string srcAfter = String.Empty;
             string imgType;
             string imgValue;
             lblMessage.Text = string.Empty;
+            string msg;
             try
             {
                 imgType = Common.captchaType;
@@ -108,16 +120,21 @@ namespace DYS
                 while (srcBefore == GetImageSrc(imgValue, imgType, out msg))
                 {
                     Thread.Sleep(100);
+                    Common.tryCount++;
+                    if (Common.tryCount == 50) { break; }
                 }
                 srcAfter = GetImageSrc(imgValue, imgType, out msg);
-                
+
                 if (srcAfter != String.Empty && srcBefore != String.Empty && srcAfter != srcBefore)
                 {
                     WaitForImageLoad(imgValue, out msg, imgType);
                     if (GetCaptchaPicture(imgType, imgValue, out msg))
                     {
-                        pbCaptcha.Image = CaptchaService.TakeScreenshot(weCaptchaImg, out msg);
-                        if (pbCaptcha.Image != null && pbCaptcha.Image.Size != null && pbCaptcha.Image.Width > 0 && pbCaptcha.Image.Height > 0)
+                        this.Invoke((MethodInvoker)delegate
+                        {
+                            pbCaptcha.Image = CaptchaService.TakeScreenshot(weCaptchaImg, out msg);
+                        });
+                        if (pbCaptcha.Image != null && pbCaptcha.Image.Width > 0 && pbCaptcha.Image.Height > 0)
                         {
                             pbCaptcha.Width = pbCaptcha.Image.Width;
                             pbCaptcha.Height = pbCaptcha.Image.Height;
@@ -130,13 +147,22 @@ namespace DYS
                         }
                     }
                 }
-                else { lblMessage.Text = "Kod yenilenemedi!"; }
+                else
+                {
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        lblMessage.Text = "Kod yenilenemedi!";
+                    });
+                }
                 Common.driver.Manage().Window.Minimize();
             }
             catch (Exception ex)
             {
                 msg = ex.Message.ToString();
-                lblMessage.Text = $"Kod yenilenemedi! Hata:{msg}";
+                this.Invoke((MethodInvoker)delegate
+                {
+                    lblMessage.Text = $"Kod yenilenemedi! Hata:{msg}";
+                });
             }
         }
         public void BringFront()
@@ -159,10 +185,10 @@ namespace DYS
                     case "t":
                         weCaptchaImg = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.TagName(element)));
                         break;
-                    case "c":
+                    case "cl":
                         weCaptchaImg = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.ClassName(element)));
                         break;
-                    case "s":
+                    case "c":
                         weCaptchaImg = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.CssSelector(element)));
                         break;
                     case "n":
@@ -270,6 +296,38 @@ namespace DYS
         private void btnCancel_Click(object sender, EventArgs e)
         {
             Common.cancelProcess = true;
+        }
+        private void txtCaptcha_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (Common.loginType == "0")
+            {
+                if (Char.IsDigit(e.KeyChar) || e.KeyChar == '\b' || Char.IsControl(e.KeyChar) || Char.IsLetter(e.KeyChar))
+                {
+                    e.Handled = false;
+                }
+                else
+                {
+                    e.Handled = true;
+                }
+            }
+            else if (Common.loginType == "1")
+            {
+                if (Char.IsDigit(e.KeyChar) || e.KeyChar == '\b' || Char.IsControl(e.KeyChar))
+                {
+                    e.Handled = false;
+                }
+                else
+                {
+                    e.Handled = true;
+                }
+            }
+        }
+        private void txtCaptcha_TextChanged(object sender, EventArgs e)
+        {
+            if (Common.loginType == "1" && txtCaptcha.Text.Length == 6)
+            {
+                btnLogin_Click(btnLogin, new EventArgs()); 
+            }
         }
     }
 }

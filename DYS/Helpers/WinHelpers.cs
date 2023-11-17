@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Text;
 using WebDriverManager;
 using WebDriverManager.DriverConfigs.Impl;
+using static System.Windows.Forms.Design.AxImporter;
 
 namespace DYS.Helpers
 {
@@ -17,8 +18,8 @@ namespace DYS.Helpers
     {
         private static IWebDriver? driver;
         private static WebDriverWait? wait;
-        private static int ZoomValue = 100;
-        private static int ZoomIncrement = 25;
+        private static double ZoomValue = 1;
+        private static double ZoomIncrement = 0.25;
 
         public static void ZoomIn()
         {
@@ -30,7 +31,7 @@ namespace DYS.Helpers
             ZoomValue -= ZoomIncrement;
             Zoom(ZoomValue);
         }
-        private static void Zoom(int level)
+        private static void Zoom(double level)
         {
             WebDriverWait wait = GetWait();
             wait.Until(e => ((IJavaScriptExecutor)driver).ExecuteScript(string.Format("document.body.style.zoom='{0}%'", level)));
@@ -74,6 +75,9 @@ namespace DYS.Helpers
             firefoxProfile.DeleteAfterUse = true;
 
             firefoxOptions.Profile = firefoxProfile;
+            firefoxOptions.LogLevel = FirefoxDriverLogLevel.Trace;
+            string logPath = Path.Combine(Application.StartupPath, "geckodriver.log");
+            firefoxOptions.AddArgument($"-moz-log={logPath}");
             if (hideBrowser)
             {
                 fDriverService = FirefoxDriverService.CreateDefaultService(Application.StartupPath);
@@ -99,7 +103,6 @@ namespace DYS.Helpers
                 fDriverService.HideCommandPromptWindow = true;
                 driver = new FirefoxDriver(fDriverService, firefoxOptions);
             }
-
             return driver;
         }
         public static IWebDriver SetChromeOptionsForDownload(bool hideBrowser, out string msg)
@@ -429,6 +432,105 @@ namespace DYS.Helpers
             return new WebDriverWait(driver, TimeSpan.FromSeconds(Models.Common.maxWait));
         }
         public static bool ExecuteScript(string t, string tv)
+        {
+            wait = GetWait();
+            string selector = "";
+            string command = "";
+            Common.tryCount = 0;
+            switch (t)
+            {
+                case "x":
+                    selector = tv.Replace("'", "\\'");
+                    command = $"function checkIfElemExists(selector) {{" +
+                                    $"return new Promise(resolve => {{" +
+                                        $"var clickButton = document.evaluate (selector, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;" +
+                                            $"if (clickButton == null) {{ window.requestAnimationFrame(() => checkIfElemExists(selector)); }}" +
+                                            $"else {{ return resolve('ready'); }}" +
+                                    $"}})" +
+                               $"}}" +
+                               $"return checkIfElemExists('{selector}');";
+                    break;
+                case "i":
+                    selector = $"#{tv}";
+                    command = $"function waitForElm(selector) {{" +
+                                    $"return new Promise(resolve => {{" +
+                                        $"if (document.querySelector(selector)) {{" +
+                                            $"return resolve('ready');" +
+                                        $"}}" +
+                                    $"}});" +
+                               $"}}" +
+                               $"return waitForElm('{selector}');";
+                    break;
+                case "cl":
+                    selector = $".{tv}";
+                    command = $"function waitForElm(selector) {{" +
+                                    $"return new Promise(resolve => {{" +
+                                        $"if (document.querySelector(selector)) {{" +
+                                            $"return resolve('ready');" +
+                                        $"}}" +
+                                    $"}});" +
+                               $"}}" +
+                               $"return waitForElm('{selector}');";
+                    break;
+                case "tn":
+                    selector = tv;
+                    command = $"function waitForElm(selector) {{" +
+                                    $"return new Promise(resolve => {{" +
+                                        $"if (document.querySelector(selector)) {{" +
+                                            $"return resolve('ready');" +
+                                        $"}}" +
+                                    $"}});" +
+                               $"}}" +
+                               $"return waitForElm('{selector}');";
+                    break;
+                case "n":
+                    selector = tv;
+                    command = $"function waitForElm(selector) {{" +
+                                    $"return new Promise(resolve => {{" +
+                                        $"if (document.querySelector(selector)) {{" +
+                                            $"return resolve('ready');" +
+                                        $"}}" +
+                                    $"}});" +
+                               $"}}" +
+                               $"return waitForElm('[name=\"{selector}\"]');";
+                    break;
+                case "t":
+                    selector = tv.Replace("'", "\\'");
+                    command = $"function waitForLinkByText(text) {{" +
+                                    $"return new Promise(resolve => {{" +
+                                        $"const links = document.querySelectorAll('a');" +
+                                        $"for (const link of links) {{" +
+                                            $"if (link.textContent.includes(text)) {{" +
+                                                $"resolve('ready');" +
+                                                $"return;" +
+                                            $"}}" +
+                                        $"}}" +
+                                        $"resolve(null);" +
+                                    $"}});" +
+                               $"}}" +
+                               $"return waitForLinkByText('{selector}');";
+                    break;
+            }
+
+            bool result = false;
+            while (result == false)
+            {
+                try
+                {
+                    result = wait.Until(e => ((IJavaScriptExecutor)Common.driver).ExecuteScript(command).Equals("ready"));
+                }
+                catch (Exception ex)
+                {
+                    WaitForPageLoad(out Common.msg);
+                }
+                Common.tryCount++;
+                if (Common.tryCount >= 5)
+                    break;
+            }
+            Common.tryCount = 1;
+            return result;
+        }
+        public static bool ExecuteScript2(string t, string tv)
         {
             wait = GetWait();
             string selector = "";

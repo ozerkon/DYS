@@ -9,7 +9,7 @@
     <ApplicationIcon>dys.ico</ApplicationIcon>
     <Title>Dys Otomatik Onaylama</Title>
     <IncludeSymbols>False</IncludeSymbols>
-    <Version>2.0.0.0</Version>
+    <Version>2.0.0.2</Version>
     <Description>* Mebbis Dosya Yönetim Sistemi (DYS) üzerinde oturum açarak okunmamış mesajları açarak okundu olarak onaylar.
 
 * Sisteme giriş için E-devlet ya da Mebbis şifresi kullanılabilir.

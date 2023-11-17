@@ -48,6 +48,7 @@
             lblReport = new Label();
             btnCancel = new Button();
             pbProcess = new ProgressBar();
+            lblRemain = new Label();
             gbBrowser.SuspendLayout();
             gbLogin.SuspendLayout();
             gbLoginInfo.SuspendLayout();
@@ -93,7 +94,6 @@
             // rbFirefox
             // 
             rbFirefox.AutoSize = true;
-            rbFirefox.Enabled = false;
             rbFirefox.Location = new Point(19, 22);
             rbFirefox.Name = "rbFirefox";
             rbFirefox.Size = new Size(61, 19);
@@ -220,6 +220,7 @@
             // 
             // gbProcessSummary
             // 
+            gbProcessSummary.Controls.Add(lblRemain);
             gbProcessSummary.Controls.Add(lblReport);
             gbProcessSummary.Controls.Add(btnCancel);
             gbProcessSummary.Controls.Add(pbProcess);
@@ -236,7 +237,7 @@
             lblReport.ForeColor = Color.Red;
             lblReport.Location = new Point(18, 22);
             lblReport.Name = "lblReport";
-            lblReport.Size = new Size(355, 279);
+            lblReport.Size = new Size(355, 240);
             lblReport.TabIndex = 9;
             lblReport.Text = "lblReport";
             // 
@@ -258,6 +259,17 @@
             pbProcess.Size = new Size(355, 23);
             pbProcess.Style = ProgressBarStyle.Continuous;
             pbProcess.TabIndex = 10;
+            // 
+            // lblRemain
+            // 
+            lblRemain.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lblRemain.ForeColor = Color.Red;
+            lblRemain.Location = new Point(18, 275);
+            lblRemain.Name = "lblRemain";
+            lblRemain.Size = new Size(355, 23);
+            lblRemain.TabIndex = 12;
+            lblRemain.Text = "lblRemain";
+            lblRemain.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // fMain
             // 
@@ -311,5 +323,6 @@
         private Button btnCancel;
         private ProgressBar pbProcess;
         private Label lblReport;
+        private Label lblRemain;
     }
 }

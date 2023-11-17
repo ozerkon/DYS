@@ -29,199 +29,200 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(fLogin));
-            this.gbLoginInfo = new System.Windows.Forms.GroupBox();
-            this.texPass = new System.Windows.Forms.TextBox();
-            this.textAddTcno = new System.Windows.Forms.TextBox();
-            this.lblPass = new System.Windows.Forms.Label();
-            this.lblTckn = new System.Windows.Forms.Label();
-            this.gbCaptcha = new System.Windows.Forms.GroupBox();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.pbCaptcha = new System.Windows.Forms.PictureBox();
-            this.btnRefreshCaptcha = new System.Windows.Forms.Button();
-            this.txtCaptcha = new System.Windows.Forms.TextBox();
-            this.lblCode = new System.Windows.Forms.Label();
-            this.btnLogin = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.lblMessage = new System.Windows.Forms.Label();
-            this.gbLoginInfo.SuspendLayout();
-            this.gbCaptcha.SuspendLayout();
-            this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbCaptcha)).BeginInit();
-            this.SuspendLayout();
+            gbLoginInfo = new GroupBox();
+            texPass = new TextBox();
+            textAddTcno = new TextBox();
+            lblPass = new Label();
+            lblTckn = new Label();
+            gbCaptcha = new GroupBox();
+            panel1 = new Panel();
+            pbCaptcha = new PictureBox();
+            btnRefreshCaptcha = new Button();
+            txtCaptcha = new TextBox();
+            lblCode = new Label();
+            btnLogin = new Button();
+            btnCancel = new Button();
+            lblMessage = new Label();
+            gbLoginInfo.SuspendLayout();
+            gbCaptcha.SuspendLayout();
+            panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pbCaptcha).BeginInit();
+            SuspendLayout();
             // 
             // gbLoginInfo
             // 
-            this.gbLoginInfo.Controls.Add(this.texPass);
-            this.gbLoginInfo.Controls.Add(this.textAddTcno);
-            this.gbLoginInfo.Controls.Add(this.lblPass);
-            this.gbLoginInfo.Controls.Add(this.lblTckn);
-            this.gbLoginInfo.Location = new System.Drawing.Point(12, 12);
-            this.gbLoginInfo.Name = "gbLoginInfo";
-            this.gbLoginInfo.Size = new System.Drawing.Size(291, 98);
-            this.gbLoginInfo.TabIndex = 1;
-            this.gbLoginInfo.TabStop = false;
-            this.gbLoginInfo.Text = "E-Devlet Giriş Bilgileri";
+            gbLoginInfo.Controls.Add(texPass);
+            gbLoginInfo.Controls.Add(textAddTcno);
+            gbLoginInfo.Controls.Add(lblPass);
+            gbLoginInfo.Controls.Add(lblTckn);
+            gbLoginInfo.Location = new Point(12, 12);
+            gbLoginInfo.Name = "gbLoginInfo";
+            gbLoginInfo.Size = new Size(291, 98);
+            gbLoginInfo.TabIndex = 0;
+            gbLoginInfo.TabStop = false;
+            gbLoginInfo.Text = "E-Devlet Giriş Bilgileri";
             // 
             // texPass
             // 
-            this.texPass.Location = new System.Drawing.Point(145, 54);
-            this.texPass.Name = "texPass";
-            this.texPass.PasswordChar = '*';
-            this.texPass.Size = new System.Drawing.Size(140, 23);
-            this.texPass.TabIndex = 3;
+            texPass.Location = new Point(145, 54);
+            texPass.Name = "texPass";
+            texPass.PasswordChar = '*';
+            texPass.Size = new Size(140, 23);
+            texPass.TabIndex = 4;
             // 
             // textAddTcno
             // 
-            this.textAddTcno.Location = new System.Drawing.Point(145, 20);
-            this.textAddTcno.MaxLength = 11;
-            this.textAddTcno.Name = "textAddTcno";
-            this.textAddTcno.Size = new System.Drawing.Size(140, 23);
-            this.textAddTcno.TabIndex = 2;
-            this.textAddTcno.TextChanged += new System.EventHandler(this.textAddTcno_TextChanged);
-            this.textAddTcno.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textAddTcno_KeyPress);
+            textAddTcno.Location = new Point(145, 20);
+            textAddTcno.MaxLength = 11;
+            textAddTcno.Name = "textAddTcno";
+            textAddTcno.Size = new Size(140, 23);
+            textAddTcno.TabIndex = 2;
+            textAddTcno.TextChanged += textAddTcno_TextChanged;
+            textAddTcno.KeyPress += textAddTcno_KeyPress;
             // 
             // lblPass
             // 
-            this.lblPass.AutoSize = true;
-            this.lblPass.Location = new System.Drawing.Point(19, 58);
-            this.lblPass.Name = "lblPass";
-            this.lblPass.Size = new System.Drawing.Size(92, 15);
-            this.lblPass.TabIndex = 0;
-            this.lblPass.Text = "E-Devlet Şifreniz";
+            lblPass.AutoSize = true;
+            lblPass.Location = new Point(19, 58);
+            lblPass.Name = "lblPass";
+            lblPass.Size = new Size(92, 15);
+            lblPass.TabIndex = 3;
+            lblPass.Text = "E-Devlet Şifreniz";
             // 
             // lblTckn
             // 
-            this.lblTckn.AutoSize = true;
-            this.lblTckn.Location = new System.Drawing.Point(19, 24);
-            this.lblTckn.Name = "lblTckn";
-            this.lblTckn.Size = new System.Drawing.Size(117, 15);
-            this.lblTckn.TabIndex = 0;
-            this.lblTckn.Text = "TC Kimlik Numaranız";
+            lblTckn.AutoSize = true;
+            lblTckn.Location = new Point(19, 24);
+            lblTckn.Name = "lblTckn";
+            lblTckn.Size = new Size(117, 15);
+            lblTckn.TabIndex = 1;
+            lblTckn.Text = "TC Kimlik Numaranız";
             // 
             // gbCaptcha
             // 
-            this.gbCaptcha.Controls.Add(this.panel1);
-            this.gbCaptcha.Controls.Add(this.btnRefreshCaptcha);
-            this.gbCaptcha.Controls.Add(this.txtCaptcha);
-            this.gbCaptcha.Controls.Add(this.lblCode);
-            this.gbCaptcha.Location = new System.Drawing.Point(16, 119);
-            this.gbCaptcha.Name = "gbCaptcha";
-            this.gbCaptcha.Size = new System.Drawing.Size(291, 181);
-            this.gbCaptcha.TabIndex = 2;
-            this.gbCaptcha.TabStop = false;
-            this.gbCaptcha.Text = "Güvenlik Kodu Girişi";
+            gbCaptcha.Controls.Add(panel1);
+            gbCaptcha.Controls.Add(btnRefreshCaptcha);
+            gbCaptcha.Controls.Add(txtCaptcha);
+            gbCaptcha.Controls.Add(lblCode);
+            gbCaptcha.Location = new Point(16, 119);
+            gbCaptcha.Name = "gbCaptcha";
+            gbCaptcha.Size = new Size(291, 181);
+            gbCaptcha.TabIndex = 5;
+            gbCaptcha.TabStop = false;
+            gbCaptcha.Text = "Güvenlik Kodu Girişi";
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.pbCaptcha);
-            this.panel1.Location = new System.Drawing.Point(6, 22);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(276, 78);
-            this.panel1.TabIndex = 4;
+            panel1.Controls.Add(pbCaptcha);
+            panel1.Location = new Point(6, 22);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(276, 78);
+            panel1.TabIndex = 6;
             // 
             // pbCaptcha
             // 
-            this.pbCaptcha.Location = new System.Drawing.Point(27, 16);
-            this.pbCaptcha.Name = "pbCaptcha";
-            this.pbCaptcha.Size = new System.Drawing.Size(223, 43);
-            this.pbCaptcha.TabIndex = 0;
-            this.pbCaptcha.TabStop = false;
+            pbCaptcha.Location = new Point(27, 16);
+            pbCaptcha.Name = "pbCaptcha";
+            pbCaptcha.Size = new Size(223, 43);
+            pbCaptcha.TabIndex = 0;
+            pbCaptcha.TabStop = false;
             // 
             // btnRefreshCaptcha
             // 
-            this.btnRefreshCaptcha.Image = global::DYS.Properties.Resources.refresh;
-            this.btnRefreshCaptcha.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnRefreshCaptcha.Location = new System.Drawing.Point(20, 145);
-            this.btnRefreshCaptcha.Name = "btnRefreshCaptcha";
-            this.btnRefreshCaptcha.Size = new System.Drawing.Size(261, 30);
-            this.btnRefreshCaptcha.TabIndex = 3;
-            this.btnRefreshCaptcha.Text = "Güvenlik Kodunu Yenile";
-            this.btnRefreshCaptcha.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnRefreshCaptcha.UseVisualStyleBackColor = true;
-            this.btnRefreshCaptcha.Click += new System.EventHandler(this.btnRefreshCaptcha_Click);
+            btnRefreshCaptcha.Image = Properties.Resources.refresh;
+            btnRefreshCaptcha.ImageAlign = ContentAlignment.MiddleLeft;
+            btnRefreshCaptcha.Location = new Point(20, 145);
+            btnRefreshCaptcha.Name = "btnRefreshCaptcha";
+            btnRefreshCaptcha.Size = new Size(261, 30);
+            btnRefreshCaptcha.TabIndex = 9;
+            btnRefreshCaptcha.Text = "Güvenlik Kodunu Yenile";
+            btnRefreshCaptcha.TextImageRelation = TextImageRelation.ImageBeforeText;
+            btnRefreshCaptcha.UseVisualStyleBackColor = true;
+            btnRefreshCaptcha.Click += btnRefreshCaptcha_Click;
             // 
             // txtCaptcha
             // 
-            this.txtCaptcha.Location = new System.Drawing.Point(145, 113);
-            this.txtCaptcha.MaxLength = 11;
-            this.txtCaptcha.Name = "txtCaptcha";
-            this.txtCaptcha.Size = new System.Drawing.Size(140, 23);
-            this.txtCaptcha.TabIndex = 2;
+            txtCaptcha.Location = new Point(145, 113);
+            txtCaptcha.MaxLength = 11;
+            txtCaptcha.Name = "txtCaptcha";
+            txtCaptcha.Size = new Size(140, 23);
+            txtCaptcha.TabIndex = 8;
+            txtCaptcha.TextChanged += txtCaptcha_TextChanged;
+            txtCaptcha.KeyPress += txtCaptcha_KeyPress;
             // 
             // lblCode
             // 
-            this.lblCode.AutoSize = true;
-            this.lblCode.Location = new System.Drawing.Point(15, 117);
-            this.lblCode.Name = "lblCode";
-            this.lblCode.Size = new System.Drawing.Size(84, 15);
-            this.lblCode.TabIndex = 0;
-            this.lblCode.Text = "Güvenlik Kodu";
+            lblCode.AutoSize = true;
+            lblCode.Location = new Point(15, 117);
+            lblCode.Name = "lblCode";
+            lblCode.Size = new Size(84, 15);
+            lblCode.TabIndex = 7;
+            lblCode.Text = "Güvenlik Kodu";
             // 
             // btnLogin
             // 
-            this.btnLogin.Image = global::DYS.Properties.Resources.login_32;
-            this.btnLogin.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnLogin.Location = new System.Drawing.Point(49, 354);
-            this.btnLogin.Name = "btnLogin";
-            this.btnLogin.Size = new System.Drawing.Size(99, 39);
-            this.btnLogin.TabIndex = 6;
-            this.btnLogin.Text = "GİRİŞ";
-            this.btnLogin.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnLogin.UseVisualStyleBackColor = true;
-            this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
+            btnLogin.Image = Properties.Resources.login_32;
+            btnLogin.ImageAlign = ContentAlignment.MiddleLeft;
+            btnLogin.Location = new Point(49, 354);
+            btnLogin.Name = "btnLogin";
+            btnLogin.Size = new Size(99, 39);
+            btnLogin.TabIndex = 11;
+            btnLogin.Text = "GİRİŞ";
+            btnLogin.TextImageRelation = TextImageRelation.ImageBeforeText;
+            btnLogin.UseVisualStyleBackColor = true;
+            btnLogin.Click += btnLogin_Click;
             // 
             // btnCancel
             // 
-            this.btnCancel.Image = global::DYS.Properties.Resources.cancel_32;
-            this.btnCancel.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnCancel.Location = new System.Drawing.Point(157, 354);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(99, 39);
-            this.btnCancel.TabIndex = 6;
-            this.btnCancel.Text = "VAZGEÇ";
-            this.btnCancel.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            btnCancel.Image = Properties.Resources.cancel_32;
+            btnCancel.ImageAlign = ContentAlignment.MiddleLeft;
+            btnCancel.Location = new Point(157, 354);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(99, 39);
+            btnCancel.TabIndex = 12;
+            btnCancel.Text = "VAZGEÇ";
+            btnCancel.TextImageRelation = TextImageRelation.ImageBeforeText;
+            btnCancel.UseVisualStyleBackColor = true;
+            btnCancel.Click += btnCancel_Click;
             // 
             // lblMessage
             // 
-            this.lblMessage.ForeColor = System.Drawing.Color.Red;
-            this.lblMessage.Location = new System.Drawing.Point(16, 305);
-            this.lblMessage.Name = "lblMessage";
-            this.lblMessage.Size = new System.Drawing.Size(291, 46);
-            this.lblMessage.TabIndex = 7;
-            this.lblMessage.Text = "label1";
+            lblMessage.ForeColor = Color.Red;
+            lblMessage.Location = new Point(16, 305);
+            lblMessage.Name = "lblMessage";
+            lblMessage.Size = new Size(291, 46);
+            lblMessage.TabIndex = 10;
+            lblMessage.Text = "label1";
             // 
             // fLogin
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(329, 404);
-            this.ControlBox = false;
-            this.Controls.Add(this.lblMessage);
-            this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.btnLogin);
-            this.Controls.Add(this.gbCaptcha);
-            this.Controls.Add(this.gbLoginInfo);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(345, 443);
-            this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(345, 443);
-            this.Name = "fLogin";
-            this.ShowInTaskbar = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "fLogin";
-            this.Load += new System.EventHandler(this.fLogin_Load);
-            this.gbLoginInfo.ResumeLayout(false);
-            this.gbLoginInfo.PerformLayout();
-            this.gbCaptcha.ResumeLayout(false);
-            this.gbCaptcha.PerformLayout();
-            this.panel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pbCaptcha)).EndInit();
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            CancelButton = btnCancel;
+            ClientSize = new Size(329, 404);
+            ControlBox = false;
+            Controls.Add(lblMessage);
+            Controls.Add(btnCancel);
+            Controls.Add(btnLogin);
+            Controls.Add(gbCaptcha);
+            Controls.Add(gbLoginInfo);
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
+            MaximumSize = new Size(345, 443);
+            MinimizeBox = false;
+            MinimumSize = new Size(345, 443);
+            Name = "fLogin";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "fLogin";
+            TopMost = true;
+            Load += fLogin_Load;
+            gbLoginInfo.ResumeLayout(false);
+            gbLoginInfo.PerformLayout();
+            gbCaptcha.ResumeLayout(false);
+            gbCaptcha.PerformLayout();
+            panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pbCaptcha).EndInit();
+            ResumeLayout(false);
         }
 
         #endregion

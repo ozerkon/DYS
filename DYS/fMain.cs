@@ -19,7 +19,9 @@ namespace DYS
         private void fMain_Load(object sender, EventArgs e)
         {
             lblMessage.Text = "";
+            lblRemain.Text = "";
             textAddTcno.Text = Settings.Default.tckn;
+
             if (Settings.Default.browser == "0") { Common.browser = "0"; rbFirefox.Checked = true; cbHideBrowser.Text = "Firefox'u arkaplanda çalýþtýr"; }
             else if (Settings.Default.browser == "1") { Common.browser = "1"; rbChrome.Checked = true; cbHideBrowser.Text = "Chrome'u arkaplanda çalýþtýr"; }
 
@@ -31,6 +33,7 @@ namespace DYS
             BringFront();
 
             // gecko güncellenince sil
+            rbFirefox.Enabled = false;
             rbChrome.Checked = true;
             Settings.Default.browser = "1";
             Common.browser = "1";
@@ -216,6 +219,10 @@ namespace DYS
             else
             {
                 if (lblMessage.Text.Contains("Chrome sürümü güncel deðil")) { }
+                else if (Common.cancel)
+                {
+                    lblMessage.Text = Common.mesaj;
+                }
                 else if (Common.confirmError == true)
                 {
                     lblMessage.Text = Common.isManager ? $"0naylama iþlemi hatalarla tamamlandý.\r\n{Common.totalMessages} adet mesajdan {Common.confirmedMessages} adedi onaylandý\r\n{Common.nonConfirmedMessages} adet mesajý DYS programý ile onaylamanýz gerekli" : $"0naylama iþlemi hatalarla tamamlandý.\r\n{Common.totalMessages} adet mesajdan {Common.confirmedMessages} adedi onaylandý";
@@ -240,22 +247,46 @@ namespace DYS
             lblReport.Text += "* mebbis.meb.gov.tr sayfasý açýldý.\r\n";
             msg = "";
             WinHelpers.WaitForPageLoad(out Common.msg);
-            if (Common.driver.PageSource.Contains("Doðrulamasý Aktif"))
+
+            if (Common.driver.Url == "https://mebbis.meb.gov.tr/redirect.aspx")
             {
                 Common.mebAjandaActive = true;
                 fLogin f = new fLogin(true);
-                while (Common.driver.PageSource.Contains("Doðrulamasý Aktif") || Common.driver.PageSource.Contains("Doðrulama Gerçekleþmedi"))
+                Common.tryCount = 0;
+                Common.driver.Manage().Window.Minimize();
+                lblReport.Text += "* Meb Ajanda bildirim onayý bekleniyor...\r\n";
+                while (Common.driver.Url == "https://mebbis.meb.gov.tr/redirect.aspx")
                 {
+                    Thread.Sleep(1000); Common.tryCount++;
+                    if (Common.tryCount == 180) break;
+                }
+                if (Common.driver.Url == "https://mebbis.meb.gov.tr/redirect.aspx") lblReport.Text += "* Bildirim onaylanmadý lütfen doðrulama kodunu giriniz";
+
+                while (Common.driver.Url == "https://mebbis.meb.gov.tr/redirect.aspx")
+                {
+                    Common.driver.Manage().Window.Minimize();
                     if (f.ShowDialog() == DialogResult.OK)
                     {
-                        Common.mebAjandaText = WinHelpers.GetElementBy("i", "txtDogrulamaKodu", out Common.msg);
-                        Common.mebAjandaButton = WinHelpers.GetElementBy("i", "btnDogrula", out Common.msg);
-                        if (Common.mebAjandaText != null && Common.mebAjandaButton != null)
-                        {
-                            Common.mebAjandaText.Clear();
-                            Common.mebAjandaText.SendKeys(Common.captcha);
-                            Common.mebAjandaButton.Click();
-                        }
+                        Common.firstInput = WinHelpers.GetElementBy("i", "firstInput", out Common.msg);
+                        Common.secondInput = WinHelpers.GetElementBy("i", "secondInput", out Common.msg);
+                        Common.thirdInput = WinHelpers.GetElementBy("i", "thirdInput", out Common.msg);
+                        Common.fourthInput = WinHelpers.GetElementBy("i", "fourthInput", out Common.msg);
+                        Common.fifthInput = WinHelpers.GetElementBy("i", "fifthInput", out Common.msg);
+                        Common.sixthInput = WinHelpers.GetElementBy("i", "sixthInput", out Common.msg);
+
+
+                        Common.firstInput.Clear();
+                        Common.firstInput.SendKeys(Common.captcha.Substring(0, 1));
+                        Common.secondInput.Clear();
+                        Common.secondInput.SendKeys(Common.captcha.Substring(1, 1));
+                        Common.thirdInput.Clear();
+                        Common.thirdInput.SendKeys(Common.captcha.Substring(2, 1));
+                        Common.fourthInput.Clear();
+                        Common.fourthInput.SendKeys(Common.captcha.Substring(3, 1));
+                        Common.fifthInput.Clear();
+                        Common.fifthInput.SendKeys(Common.captcha.Substring(4, 1));
+                        Common.sixthInput.Clear();
+                        Common.sixthInput.SendKeys(Common.captcha.Substring(5, 1));
                     }
                     else
                     {
@@ -264,19 +295,34 @@ namespace DYS
                 }
             }
 
-            IWebElement? dysFlipMenu = GetDysLink();
-            if (dysFlipMenu == null) { lblMessage.Text = "DYS giriþ linki bulunamadý\r\nLütfen daha sonra tekrar deneyin"; Common.driver.Dispose(); return false; }
-            Actions action = new Actions(Common.driver);
-            action.MoveToElement(dysFlipMenu).Perform();
+            IWebElement? dysgiris = null;
+            while (dysgiris == null)
+            {
+                Common.driver.Manage().Window.Maximize();
+                Cursor.Position = new Point(10, 10);
 
-            int tryCount = 0;
-            Thread.Sleep(1000);
-            if (Common.bgwConfirm.CancellationPending) { return false; }
-            IWebElement? dysgiris = GetLoginLink();
-            if (dysgiris == null) { lblMessage.Text = "DYS giriþ linki bulunamadý\r\nLütfen daha sonra tekrar deneyin"; Common.driver.Dispose(); return false; }
-            dysgiris.Click();
+                string script = "function __doPostBack(t,o){theForm.onsubmit&&0==theForm.onsubmit()||(theForm.__EVENTTARGET.value=t,theForm.__EVENTARGUMENT.value=o,theForm.submit())}__doPostBack(\"rptProjeler$ctl02$rptKullanicilar$ctl01$LinkButton1\",\"\");";
+                try
+                {
+                    Common.wait.Until(e => (IJavaScriptExecutor)Common.driver).ExecuteScript(script); break;
+                }
+                catch (Exception)
+                {
+                    IWebElement? dysFlipMenu = GetDysLink();
+                    if (dysFlipMenu == null) { lblMessage.Text = "DYS giriþ linki bulunamadý\r\nLütfen daha sonra tekrar deneyin"; Common.driver.Dispose(); return false; }
+                    Actions action = new Actions(Common.driver);
+                    action.MoveToElement(dysFlipMenu).Perform();
 
+                    Thread.Sleep(500);
+                    if (Common.bgwConfirm.CancellationPending) { return false; }
+                    dysgiris = GetLoginLink();
+                    if (dysgiris == null) { lblMessage.Text = "DYS giriþ linki bulunamadý\r\nLütfen daha sonra tekrar deneyin"; Common.driver.Dispose(); return false; }
+                    dysgiris.Click();
+                }
+            }
 
+            Common.tryCount = 0;
+            Common.driver.Manage().Window.Minimize();
 
             if (Common.driver.WindowHandles.Count > 1)
             {
@@ -284,16 +330,16 @@ namespace DYS
                 WinHelpers.WaitForPageLoad(out Common.msg);
                 if (Common.bgwConfirm.CancellationPending) { return false; }
             }
-            tryCount = 0;
+
             lblReport.Text += "* dysweb.meb.gov.tr sekmesine geçildi.\r\n";
             List<IWebElement>? tree = null;
 
             while (tree == null)
             {
                 Thread.Sleep(100);
-                tree = Common.driver.FindElements(By.CssSelector("li[id^='menuForm:roller_tree:']")).ToList();
-                tryCount++;
-                if (tryCount == 300) { lblMessage.Text = "Sayfa 30 saniye boyunca yanýt vermediði için iþlem iptal edildi"; Common.driver.Dispose(); return false; }
+                tree = Common.driver.FindElements(By.CssSelector("li[id^='menuForm:roller_tree:0']")).ToList();
+                Common.tryCount++;
+                if (Common.tryCount == 300) { lblMessage.Text = "Sayfa 30 saniye boyunca yanýt vermediði için iþlem iptal edildi"; Common.driver.Dispose(); return false; }
                 if (Common.bgwConfirm.CancellationPending) { return false; }
             }
 
@@ -310,14 +356,14 @@ namespace DYS
             {
                 Thread.Sleep(100);
                 if (Common.driver.PageSource.Contains("evrak bulunmamaktadýr")) { lblReport.Text += "* Onaylanmamýþ mesaj yok.\r\n"; lblMessage.Text = "Onaylanmamýþ mesaj yok"; return false; }
-                tryCount++;
-                if (tryCount == 300) { lblReport.Text += "* Sayfa 30 saniye boyunca yanýt vermediði için iþlem iptal edildi.\r\n"; lblMessage.Text = "Sayfa 30 saniye boyunca yanýt vermediði için iþlem iptal edildi"; Common.driver.Dispose(); return false; }
+                Common.tryCount++;
+                if (Common.tryCount == 300) { lblReport.Text += "* Sayfa 30 saniye boyunca yanýt vermediði için iþlem iptal edildi.\r\n"; lblMessage.Text = "Sayfa 30 saniye boyunca yanýt vermediði için iþlem iptal edildi"; Common.driver.Dispose(); return false; }
                 if (Common.bgwConfirm.CancellationPending) { return false; }
             }
             IWebElement isler = WinHelpers.GetElementBy("i", "form:etiketFilter", out Common.msg);
 
             string sayi = isler.Text.Substring(23, isler.Text.Substring(23).IndexOf(" "));
-
+            //if (Screen.PrimaryScreen?.Bounds.Height < 1080) WinHelpers.ZoomOut();
             try
             {
                 Common.totalMessages = Convert.ToInt32(sayi);
@@ -354,7 +400,7 @@ namespace DYS
                         iframe = WinHelpers.GetElementBy("i", "gozdenGecirmeEkraniId", out Common.msg);
                         Thread.Sleep(500);
                         if (Common.bgwConfirm.CancellationPending) { return false; }
-                        if (Screen.PrimaryScreen?.Bounds.Height < 1080) WinHelpers.ZoomOut();
+
                     }
                     Common.driver.SwitchTo().Frame("gozdenGecirmeEkraniId");
 
@@ -364,6 +410,7 @@ namespace DYS
                     {
                         okudum.Click();
                         Common.confirmedMessages++;
+                        lblRemain.Text = $"{Common.confirmedMessages} adet mesaj onaylandý";
                         pbProcess.Value = Common.confirmedMessages;
                         if (Common.bgwConfirm.CancellationPending) { return false; }
                     }
@@ -433,6 +480,7 @@ namespace DYS
             Common.passWE.Clear();
             Common.passWE.SendKeys(Common.pass);
             Common.giris = WinHelpers.GetButtonElementBy("n", Common.btnLogin, out Common.msg);
+
             if (Common.driver.PageSource.Contains("Güvenlik Kodu"))
             {
                 Common.captchaWE = WinHelpers.GetElementBy("i", Common.tcknCaptcha, out Common.msg);
@@ -442,13 +490,36 @@ namespace DYS
 
             Common.giris.Click();
             WinHelpers.WaitForPageLoad(out Common.msg);
+            if (Common.driver.PageSource.Contains("T.C. Kimlik numaranýzý hatalý girdiniz"))
+            {
+                Common.mesaj = "T.C. Kimlik numaranýzý hatalý girdiniz";
+                Common.error = false;
+                Common.loggedIn = false;
+                Common.cancel = true;
+                return false;
+            }
+            else if (Common.driver.PageSource.Contains("Þifrenizi deðiþtirmek ister misiniz"))
+            {
+                IWebElement? submitButton = WinHelpers.GetButtonElementBy("x", "/html/body/div[1]/div/main/section/div/form/fieldset/div[3]/button", out Common.msg);
+                submitButton.Click();
+                WinHelpers.WaitForPageLoad(out Common.msg);
+            }
             if (Common.driver.PageSource.Contains("Mebbis Kullanýcýnýz Bulunmamaktadýr"))
             {
-                lblMessage.Text = "Mebbsis üyelðiniz yoktur"; Common.error = false; Common.loggedIn = false; return false;
+                Common.mesaj = "Mebbsis üyelðiniz yoktur";
+                Common.error = false;
+                Common.loggedIn = false;
+                Common.cancel = true;
+                return false;
             }
             if (Common.driver.PageSource.Contains("Üst üste baþarýsýz giriþ"))
             {
-                MessageBox.Show($"Üst üste baþarýsýz giriþ denemeleri yaptýðýnýz için hesabýnýz bir saatliðine askýya alýnmýþtýr. Lütfen daha sonra tekrar deneyiniz ya da Mebbis þifresi ile giriþ yapýnýz.", "E-devlet giriþ hatasý!"); Common.error = false; Common.loggedIn = false; return false;
+                MessageBox.Show($"Üst üste baþarýsýz giriþ denemeleri yaptýðýnýz için hesabýnýz bir saatliðine askýya alýnmýþtýr. Lütfen daha sonra tekrar deneyiniz ya da Mebbis þifresi ile giriþ yapýnýz.", "E-devlet giriþ hatasý!");
+                Common.mesaj = "E-devlet giriþ hatasý! Mebbis þifresi ile giriþ yapýnýz";
+                Common.error = false;
+                Common.loggedIn = false;
+                Common.cancel = true;
+                return false;
             }
 
             if (Common.driver.PageSource.Contains("Kimlik no veya þifre hatalýdýr") || Common.driver.PageSource.Contains("Lütfen formdaki hatalý alanlarý düzelterek yeniden deneyiniz"))
@@ -457,10 +528,10 @@ namespace DYS
 
                 if (Common.driver.PageSource.Contains("Güvenlik Kodu"))
                 {
-                    Common.captchaType = "x";
-                    Common.captchaValue = "/html/body/div[1]/main/section[2]/form/fieldset/div[3]/div/img";
-                    Common.rcbType = "x";
-                    Common.rcbValue = "/html/body/div[1]/main/section[2]/form/fieldset/div[3]/div/img";
+                    Common.captchaType = "cl";
+                    Common.captchaValue = "captchaImage";
+                    Common.rcbType = "cl";
+                    Common.rcbValue = "captchaImage";
 
                     IWebElement captchaPic = WinHelpers.GetElementBy(Common.captchaType, Common.captchaValue, out Common.msg);
                     Common.bitmap = null;
@@ -472,7 +543,7 @@ namespace DYS
 
                     if (Common.bitmap == null)
                     {
-                        lblMessage.Text = "Güvenlik Kodu bulunamadý\r\nlütfen daha sonra tekrar deneyin";
+                        Common.mesaj = "Güvenlik Kodu bulunamadý\r\nlütfen daha sonra tekrar deneyin";
                         return false;
                     }
                     else
@@ -485,7 +556,39 @@ namespace DYS
                     f = new fLogin(false);
                 }
                 if (f.ShowDialog() == DialogResult.OK) EdevletGiris();
-                else { Common.error = false; Common.loggedIn = false; Common.driver.Dispose(); lblMessage.Text = "Ýþlem iptal edildi"; Common.cancel = true; return false; }
+                else { Common.error = false; Common.loggedIn = false; Common.driver.Dispose(); Common.mesaj = "Ýþlem iptal edildi"; Common.cancel = true; return false; }
+            }
+            else if (Common.driver.PageSource.Contains("Ýki Aþamalý Giriþ Onay"))
+            {
+                lblReport.Text += "* E-Devlet mobil onay bekleniyor"; 
+                string text = "Tekrar Bildirim Gönder"; IList<IWebElement>? hiddenElements; bool passed = false;
+
+                while (!passed)
+                {
+                    while (text.Contains("Tekrar Bildirim Gönder"))
+                    {
+                        Thread.Sleep(1000);
+                        hiddenElements = ((IJavaScriptExecutor)Common.driver).ExecuteScript(@"var hiddenElements = document.querySelectorAll('.content [style*=""display: none""]'); return Array.from(hiddenElements);") as IList<IWebElement>;
+                        if (hiddenElements != null)
+                            text = hiddenElements[3].GetAttribute("textContent");
+                        else
+                            text = "";
+                    }
+                    hiddenElements = ((IJavaScriptExecutor)Common.driver).ExecuteScript(@"var hiddenElements = document.querySelectorAll('.content [style*=""display: none""]'); return Array.from(hiddenElements);") as IList<IWebElement>;
+                    if (hiddenElements != null)
+                        text = hiddenElements[0].GetAttribute("textContent");
+                    else
+                        text = "";
+
+                    if (text.Contains("Ýki aþamalý giriþ iþlemlerinde sorun"))
+                    {
+                        IWebElement? tekrarGonderId = WinHelpers.GetButtonElementBy("i", "tekrarGonderId", out Common.msg);
+                        tekrarGonderId.Click();
+                    }
+
+                    if (!Common.driver.Url.Contains("giris.turkiye.gov")) passed = true;
+                }
+                
             }
             Common.loggedIn = true;
             return true;

@@ -39,7 +39,12 @@ namespace Models
         public static IWebElement? ilksatir;
 
         public static bool mebAjandaActive = false;
-        public static IWebElement? mebAjandaText;
+        public static IWebElement? firstInput;
+        public static IWebElement? secondInput ;
+        public static IWebElement? thirdInput ;
+        public static IWebElement? fourthInput ;
+        public static IWebElement? fifthInput;
+        public static IWebElement? sixthInput;
         public static IWebElement? mebAjandaDontAsk;
         public static IWebElement? mebAjandaButton;
 
@@ -54,6 +59,9 @@ namespace Models
         public static bool hideBrowser;
         public static bool confirmError;
         public static bool isManager;
+
+        public static int tryCount = 0;
+        public static string mesaj = "";
 
         public static int totalMessages = 0;
         public static int confirmedMessages = 0;
